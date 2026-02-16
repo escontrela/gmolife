@@ -161,3 +161,24 @@ Como usuario, quiero randomizar la cuadricula con un patron que evolucione al pr
 - Configuracion avanzada de probabilidad por el usuario.
 - Modulo de IA para optimizacion de patrones.
 - Graficos de evolucion.
+
+## TASK-008 — Grafica de poblacion a la derecha
+Estado: done
+
+## Objetivo
+Mostrar una grafica simple de evolucion de poblacion a la derecha de la cuadricula.
+
+## Historia de Usuario
+Como usuario, quiero ver una grafica de la poblacion por generacion mientras simulo, para entender tendencias del patron mas alla del estado visual de la rejilla.
+
+## Criterios de Aceptacion
+- [x] La UI muestra un panel a la derecha de la cuadricula con una grafica de linea (X=generacion, Y=poblacion).
+- [x] La grafica se actualiza al usar Step y durante Play sin bloquear la interfaz.
+- [x] Al pulsar Reset, la serie de la grafica se reinicia al estado inicial.
+- [x] La grafica mantiene como minimo los ultimos 100 puntos para evitar crecimiento infinito en memoria.
+
+## Fuera de Alcance
+- Multiples series (nacimientos/muertes por separado).
+- Exportar la grafica a imagen o CSV.
+- Analiticas avanzadas o predicciones.
+- Integracion con modulo de IA.

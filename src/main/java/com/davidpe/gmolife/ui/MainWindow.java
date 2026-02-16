@@ -5,6 +5,9 @@ import com.davidpe.gmolife.ui.grid.GridState;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.geometry.Insets;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,6 +15,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.util.Random;
@@ -28,6 +32,7 @@ public final class MainWindow {
   private static final int RANDOM_VALIDATE_STEPS = 5;
   private static final double RANDOM_MIN_PROBABILITY = 0.20;
   private static final double RANDOM_MAX_PROBABILITY = 0.45;
+  private static final int POPULATION_HISTORY = 100;
 
   private final GridState gridState = new GridState(GRID_ROWS, GRID_COLUMNS);
   private final Random random = new Random();
@@ -37,9 +42,11 @@ public final class MainWindow {
   private Label generationValue;
   private Label populationValue;
   private Label speedValue;
+  private XYChart.Series<Number, Number> populationSeries;
 
   public void show(Stage stage) {
     BorderPane root = new BorderPane();
+    root.setRight(buildPopulationPanel());
     root.setTop(buildControls());
     root.setCenter(buildGrid());
 
@@ -107,6 +114,7 @@ public final class MainWindow {
       generation = 0;
       gridState.clear();
       gridView.refresh();
+      resetPopulationSeries();
       updateCounters();
       playButton.setDisable(false);
       pauseButton.setDisable(true);
@@ -133,6 +141,27 @@ public final class MainWindow {
     return controls;
   }
 
+  private VBox buildPopulationPanel() {
+    NumberAxis xAxis = new NumberAxis();
+    xAxis.setLabel("Generacion");
+    xAxis.setForceZeroInRange(false);
+    NumberAxis yAxis = new NumberAxis();
+    yAxis.setLabel("Poblacion");
+
+    LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
+    chart.setLegendVisible(false);
+    chart.setCreateSymbols(false);
+    chart.setAnimated(false);
+    chart.setMinWidth(320);
+
+    populationSeries = new XYChart.Series<>();
+    chart.getData().add(populationSeries);
+
+    VBox panel = new VBox(chart);
+    panel.setPadding(new Insets(16));
+    return panel;
+  }
+
   private void advanceAndRefresh() {
     gridState.advance();
     generation++;
@@ -145,7 +174,26 @@ public final class MainWindow {
       generationValue.setText(Integer.toString(generation));
     }
     if (populationValue != null) {
-      populationValue.setText(Integer.toString(gridState.countAliveCells()));
+      int alive = gridState.countAliveCells();
+      populationValue.setText(Integer.toString(alive));
+      updatePopulationSeries(generation, alive);
+    }
+  }
+
+  private void updatePopulationSeries(int currentGeneration, int alive) {
+    if (populationSeries == null) {
+      return;
+    }
+    populationSeries.getData().add(new XYChart.Data<>(currentGeneration, alive));
+    int size = populationSeries.getData().size();
+    if (size > POPULATION_HISTORY) {
+      populationSeries.getData().remove(0, size - POPULATION_HISTORY);
+    }
+  }
+
+  private void resetPopulationSeries() {
+    if (populationSeries != null) {
+      populationSeries.getData().clear();
     }
   }
 
