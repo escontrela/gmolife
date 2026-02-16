@@ -5,8 +5,10 @@ import javafx.scene.layout.Region;
 
 public final class EditableGridView extends GridPane {
 
-  private static final String DEAD_STYLE = "-fx-background-color: #f5f6f7; -fx-border-color: #c7cdd1; -fx-border-width: 0.5;";
-  private static final String ALIVE_STYLE = "-fx-background-color: #2ecc71; -fx-border-color: #1f2d3a; -fx-border-width: 0.5;";
+  private static final String DEAD_STYLE =
+      "-fx-background-color: #f5f6f7; -fx-border-color: #c7cdd1; -fx-border-width: 0.5;";
+  private static final String ALIVE_STYLE =
+      "-fx-background-color: #2ecc71; -fx-border-color: #1f2d3a; -fx-border-width: 0.5;";
 
   private final GridState gridState;
   private final double cellSize;
@@ -33,10 +35,11 @@ public final class EditableGridView extends GridPane {
     Region cell = new Region();
     cell.setPrefSize(cellSize, cellSize);
     updateCellStyle(cell, gridState.isAlive(row, column));
-    cell.setOnMouseClicked(event -> {
-      gridState.toggle(row, column);
-      updateCellStyle(cell, gridState.isAlive(row, column));
-    });
+    cell.setOnMouseClicked(
+        event -> {
+          gridState.toggle(row, column);
+          updateCellStyle(cell, gridState.isAlive(row, column));
+        });
     return cell;
   }
 
