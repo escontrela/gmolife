@@ -7,6 +7,7 @@ import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -23,6 +24,9 @@ public final class MainWindow {
   private final GridState gridState = new GridState(GRID_ROWS, GRID_COLUMNS);
   private EditableGridView gridView;
   private Timeline timeline;
+  private int generation;
+  private Label generationValue;
+  private Label populationValue;
 
   public void show(Stage stage) {
     BorderPane root = new BorderPane();
@@ -47,16 +51,14 @@ public final class MainWindow {
   private HBox buildControls() {
     Button stepButton = new Button("Step");
     stepButton.setOnAction(event -> {
-      gridState.advance();
-      gridView.refresh();
+      advanceAndRefresh();
     });
     Button playButton = new Button("Play");
     Button pauseButton = new Button("Pause");
     pauseButton.setDisable(true);
 
     timeline = new Timeline(new KeyFrame(Duration.millis(TICK_MILLIS), event -> {
-      gridState.advance();
-      gridView.refresh();
+      advanceAndRefresh();
     }));
     timeline.setCycleCount(Timeline.INDEFINITE);
 
@@ -74,9 +76,31 @@ public final class MainWindow {
       stepButton.setDisable(false);
     });
 
-    HBox controls = new HBox(stepButton, playButton, pauseButton);
+    Label generationLabel = new Label("Generacion:");
+    generationValue = new Label("0");
+    Label populationLabel = new Label("Poblacion:");
+    populationValue = new Label("0");
+    updateCounters();
+
+    HBox controls = new HBox(stepButton, playButton, pauseButton, generationLabel, generationValue, populationLabel, populationValue);
     controls.setPadding(new Insets(16));
     controls.setSpacing(12);
     return controls;
+  }
+
+  private void advanceAndRefresh() {
+    gridState.advance();
+    generation++;
+    gridView.refresh();
+    updateCounters();
+  }
+
+  private void updateCounters() {
+    if (generationValue != null) {
+      generationValue.setText(Integer.toString(generation));
+    }
+    if (populationValue != null) {
+      populationValue.setText(Integer.toString(gridState.countAliveCells()));
+    }
   }
 }
