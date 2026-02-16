@@ -39,3 +39,24 @@ Como usuario, quiero hacer clic en celdas de la cuadricula para alternar su esta
 - Controles Play/Pause/Step.
 - Guardar o cargar patrones.
 - Modulo de IA.
+
+## TASK-002 — Simulacion de un paso
+Estado: backlog
+
+## Objetivo
+Agregar un paso unico de simulacion que actualice la cuadricula con las reglas clasicas del Game of Life.
+
+## Historia de Usuario
+Como usuario, quiero ejecutar un paso de simulacion, para ver como evoluciona el patron sin iniciar un play continuo.
+
+## Criterios de Aceptacion
+- [ ] Existe un boton "Step" que aplica un tick a la cuadricula.
+- [ ] El tick usa las reglas clasicas (nace con 3, sobrevive con 2-3, muere en otros casos).
+- [ ] La UI refleja el nuevo estado inmediatamente tras presionar Step.
+
+## Fuera de Alcance
+- Play/Pause con temporizador.
+- Control de velocidad.
+- Contadores de generacion/poblacion.
+- Guardar/cargar patrones.
+- Modulo de IA.
