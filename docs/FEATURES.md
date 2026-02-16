@@ -21,7 +21,7 @@ Como usuario, quiero abrir la app y ver una ventana base, para confirmar que la 
 - IA.
 
 ## TASK-001 — Cuadricula editable en UI
-Estado: backlog
+Estado: done
 
 ## Objetivo
 Permitir editar manualmente el estado viva/muerta de celulas en una cuadricula visible en JavaFX.
@@ -30,9 +30,9 @@ Permitir editar manualmente el estado viva/muerta de celulas en una cuadricula v
 Como usuario, quiero hacer clic en celdas de la cuadricula para alternar su estado, para diseñar patrones iniciales antes de simular.
 
 ## Criterios de Aceptacion
-- [ ] La ventana principal muestra una cuadricula con celdas visibles.
-- [ ] Al hacer clic en una celda, alterna entre viva y muerta con cambio visual inmediato.
-- [ ] El estado de la cuadricula se mantiene en memoria mientras la app esta abierta.
+- [x] La ventana principal muestra una cuadricula con celdas visibles.
+- [x] Al hacer clic en una celda, alterna entre viva y muerta con cambio visual inmediato.
+- [x] El estado de la cuadricula se mantiene en memoria mientras la app esta abierta.
 
 ## Fuera de Alcance
 - Reglas de simulacion por ticks.
