@@ -242,3 +242,23 @@ Como usuario, quiero abrir un patron guardado, para continuar trabajando en el s
 - Soporte para multiples formatos.
 - Historial de archivos recientes.
 - Validacion avanzada del contenido.
+
+## TASK-012 — Biblioteca de patrones basicos
+Estado: done
+
+## Objetivo
+Ofrecer una lista de patrones predefinidos para cargar rapidamente en la cuadricula.
+
+## Historia de Usuario
+Como usuario, quiero seleccionar patrones clasicos, para explorar comportamientos sin dibujarlos manualmente.
+
+## Criterios de Aceptacion
+- [x] Existe un menu o selector de "Patrones" visible en la UI.
+- [x] Incluye al menos: Glider, Blinker, Toad y Beacon.
+- [x] Al seleccionar un patron, la cuadricula se limpia y el patron se inserta centrado.
+- [x] Los contadores se reinician y reflejan el patron cargado.
+
+## Fuera de Alcance
+- Editor de patrones.
+- Importar patrones desde internet.
+- Guardar favoritos.

@@ -13,6 +13,7 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
@@ -24,6 +25,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Random;
 
 public final class MainWindow {
@@ -41,6 +43,7 @@ public final class MainWindow {
   private static final double RANDOM_MIN_PROBABILITY = 0.20;
   private static final double RANDOM_MAX_PROBABILITY = 0.45;
   private static final int POPULATION_HISTORY = 100;
+  private static final List<String> BASIC_PATTERNS = List.of("Glider", "Blinker", "Toad", "Beacon");
 
   private final GridState gridState = new GridState(GRID_ROWS, GRID_COLUMNS);
   private final Random random = new Random();
@@ -164,13 +167,24 @@ public final class MainWindow {
       loadPattern();
     });
 
+    Label patternLabel = new Label("Patrones:");
+    ComboBox<String> patternPicker = new ComboBox<>();
+    patternPicker.getItems().addAll(BASIC_PATTERNS);
+    patternPicker.setPromptText("Selecciona");
+    patternPicker.setOnAction(event -> {
+      String selection = patternPicker.getValue();
+      if (selection != null && !selection.isBlank()) {
+        loadPatternCentered(patternFor(selection));
+      }
+    });
+
     Label generationLabel = new Label("Generacion:");
     generationValue = new Label("0");
     Label populationLabel = new Label("Poblacion:");
     populationValue = new Label("0");
     updateCounters();
 
-    HBox controls = new HBox(stepButton, playButton, pauseButton, resetButton, randomizeButton, saveButton, loadButton, speedLabel, speedSlider, speedValue, zoomLabel, zoomSlider, zoomValue, generationLabel, generationValue, populationLabel, populationValue);
+    HBox controls = new HBox(stepButton, playButton, pauseButton, resetButton, randomizeButton, saveButton, loadButton, patternLabel, patternPicker, speedLabel, speedSlider, speedValue, zoomLabel, zoomSlider, zoomValue, generationLabel, generationValue, populationLabel, populationValue);
     controls.setPadding(new Insets(16));
     controls.setSpacing(12);
     return controls;
@@ -331,6 +345,57 @@ public final class MainWindow {
     } catch (IOException | IllegalArgumentException ex) {
       showError("No se pudo cargar el patron: " + ex.getMessage());
     }
+  }
+
+  private boolean[][] patternFor(String name) {
+    return switch (name) {
+      case "Glider" -> new boolean[][]{
+          {false, true, false},
+          {false, false, true},
+          {true, true, true}
+      };
+      case "Blinker" -> new boolean[][]{
+          {true},
+          {true},
+          {true}
+      };
+      case "Toad" -> new boolean[][]{
+          {false, true, true, true},
+          {true, true, true, false}
+      };
+      case "Beacon" -> new boolean[][]{
+          {true, true, false, false},
+          {true, true, false, false},
+          {false, false, true, true},
+          {false, false, true, true}
+      };
+      default -> new boolean[][]{{true}};
+    };
+  }
+
+  private void loadPatternCentered(boolean[][] pattern) {
+    if (pattern == null || pattern.length == 0 || pattern[0].length == 0) {
+      showError("El patron seleccionado es invalido.");
+      return;
+    }
+    if (pattern.length > GRID_ROWS || pattern[0].length > GRID_COLUMNS) {
+      showError("El patron excede el tamano de la cuadricula.");
+      return;
+    }
+    gridState.clear();
+    int rowOffset = (GRID_ROWS - pattern.length) / 2;
+    int columnOffset = (GRID_COLUMNS - pattern[0].length) / 2;
+    for (int row = 0; row < pattern.length; row++) {
+      for (int column = 0; column < pattern[row].length; column++) {
+        if (pattern[row][column]) {
+          gridState.setCell(row + rowOffset, column + columnOffset, true);
+        }
+      }
+    }
+    generation = 0;
+    gridView.refresh();
+    resetPopulationSeries();
+    updateCounters();
   }
 
   private boolean[][] snapshotGrid() {
