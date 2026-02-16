@@ -8,6 +8,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -20,6 +21,8 @@ public final class MainWindow {
   private static final int GRID_COLUMNS = 25;
   private static final double CELL_SIZE = 24;
   private static final int TICK_MILLIS = 300;
+  private static final int MIN_TICK_MILLIS = 50;
+  private static final int MAX_TICK_MILLIS = 1000;
 
   private final GridState gridState = new GridState(GRID_ROWS, GRID_COLUMNS);
   private EditableGridView gridView;
@@ -27,6 +30,7 @@ public final class MainWindow {
   private int generation;
   private Label generationValue;
   private Label populationValue;
+  private Label speedValue;
 
   public void show(Stage stage) {
     BorderPane root = new BorderPane();
@@ -63,6 +67,20 @@ public final class MainWindow {
     }));
     timeline.setCycleCount(Timeline.INDEFINITE);
 
+    Label speedLabel = new Label("Velocidad:");
+    Slider speedSlider = new Slider(MIN_TICK_MILLIS, MAX_TICK_MILLIS, TICK_MILLIS);
+    speedSlider.setShowTickLabels(true);
+    speedSlider.setShowTickMarks(true);
+    speedSlider.setMajorTickUnit(250);
+    speedSlider.setMinorTickCount(4);
+    speedSlider.setBlockIncrement(50);
+    speedValue = new Label();
+    applySpeed(speedSlider.getValue());
+
+    speedSlider.valueProperty().addListener((obs, oldValue, newValue) -> {
+      applySpeed(newValue.doubleValue());
+    });
+
     playButton.setOnAction(event -> {
       timeline.play();
       playButton.setDisable(true);
@@ -94,7 +112,7 @@ public final class MainWindow {
     populationValue = new Label("0");
     updateCounters();
 
-    HBox controls = new HBox(stepButton, playButton, pauseButton, resetButton, generationLabel, generationValue, populationLabel, populationValue);
+    HBox controls = new HBox(stepButton, playButton, pauseButton, resetButton, speedLabel, speedSlider, speedValue, generationLabel, generationValue, populationLabel, populationValue);
     controls.setPadding(new Insets(16));
     controls.setSpacing(12);
     return controls;
@@ -113,6 +131,16 @@ public final class MainWindow {
     }
     if (populationValue != null) {
       populationValue.setText(Integer.toString(gridState.countAliveCells()));
+    }
+  }
+
+  private void applySpeed(double tickMillis) {
+    if (speedValue != null) {
+      speedValue.setText(String.format("%.0f ms", tickMillis));
+    }
+    if (timeline != null && tickMillis > 0) {
+      double rate = TICK_MILLIS / tickMillis;
+      timeline.setRate(rate);
     }
   }
 }
