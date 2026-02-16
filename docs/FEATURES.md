@@ -101,7 +101,7 @@ Como usuario, quiero ver la generacion actual y la cantidad de celulas vivas, pa
 - Modulo de IA.
 
 ## TASK-005 — Reset de simulacion
-Estado: backlog
+Estado: done
 
 ## Objetivo
 Permitir reiniciar la simulacion y limpiar la cuadricula con un solo clic.
@@ -110,10 +110,10 @@ Permitir reiniciar la simulacion y limpiar la cuadricula con un solo clic.
 Como usuario, quiero reiniciar la simulacion y borrar el tablero, para empezar un patron nuevo rapidamente.
 
 ## Criterios de Aceptacion
-- [ ] Existe un boton "Reset" visible en la UI.
-- [ ] Al hacer clic en Reset, se detiene el Play si esta activo.
-- [ ] La cuadricula queda vacia (todas las celdas muertas) y la UI se refresca.
-- [ ] Los contadores de generacion y poblacion vuelven a 0.
+- [x] Existe un boton "Reset" visible en la UI.
+- [x] Al hacer clic en Reset, se detiene el Play si esta activo.
+- [x] La cuadricula queda vacia (todas las celdas muertas) y la UI se refresca.
+- [x] Los contadores de generacion y poblacion vuelven a 0.
 
 ## Fuera de Alcance
 - Control de velocidad.

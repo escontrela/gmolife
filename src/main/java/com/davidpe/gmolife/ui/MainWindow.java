@@ -55,6 +55,7 @@ public final class MainWindow {
     });
     Button playButton = new Button("Play");
     Button pauseButton = new Button("Pause");
+    Button resetButton = new Button("Reset");
     pauseButton.setDisable(true);
 
     timeline = new Timeline(new KeyFrame(Duration.millis(TICK_MILLIS), event -> {
@@ -76,13 +77,24 @@ public final class MainWindow {
       stepButton.setDisable(false);
     });
 
+    resetButton.setOnAction(event -> {
+      timeline.stop();
+      generation = 0;
+      gridState.clear();
+      gridView.refresh();
+      updateCounters();
+      playButton.setDisable(false);
+      pauseButton.setDisable(true);
+      stepButton.setDisable(false);
+    });
+
     Label generationLabel = new Label("Generacion:");
     generationValue = new Label("0");
     Label populationLabel = new Label("Poblacion:");
     populationValue = new Label("0");
     updateCounters();
 
-    HBox controls = new HBox(stepButton, playButton, pauseButton, generationLabel, generationValue, populationLabel, populationValue);
+    HBox controls = new HBox(stepButton, playButton, pauseButton, resetButton, generationLabel, generationValue, populationLabel, populationValue);
     controls.setPadding(new Insets(16));
     controls.setSpacing(12);
     return controls;

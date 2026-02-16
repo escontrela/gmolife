@@ -65,6 +65,14 @@ public final class GridState {
     return count;
   }
 
+  public void clear() {
+    for (int row = 0; row < rows; row++) {
+      for (int column = 0; column < columns; column++) {
+        cells[row][column] = false;
+      }
+    }
+  }
+
   private int countAliveNeighbors(int row, int column) {
     int count = 0;
     for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
