@@ -62,7 +62,7 @@ Como usuario, quiero ejecutar un paso de simulacion, para ver como evoluciona el
 - Modulo de IA.
 
 ## TASK-003 — Play/Pause con temporizador
-Estado: backlog
+Estado: done
 
 ## Objetivo
 Permitir iniciar y pausar la simulacion continua con un temporizador fijo.
@@ -71,9 +71,9 @@ Permitir iniciar y pausar la simulacion continua con un temporizador fijo.
 Como usuario, quiero reproducir y pausar la simulacion automaticamente, para observar la evolucion sin presionar Step repetidamente.
 
 ## Criterios de Aceptacion
-- [ ] Existe un boton "Play" que inicia ticks continuos con un temporizador fijo.
-- [ ] Existe un boton "Pause" que detiene los ticks.
-- [ ] Mientras esta en Play, la cuadricula se actualiza automaticamente en pantalla.
+- [x] Existe un boton "Play" que inicia ticks continuos con un temporizador fijo.
+- [x] Existe un boton "Pause" que detiene los ticks.
+- [x] Mientras esta en Play, la cuadricula se actualiza automaticamente en pantalla.
 
 ## Fuera de Alcance
 - Control de velocidad.
