@@ -120,3 +120,23 @@ Como usuario, quiero reiniciar la simulacion y borrar el tablero, para empezar u
 - Guardar/cargar patrones.
 - Modulo de IA.
 - Zoom o redimension de la cuadricula.
+
+## TASK-006 — Control de velocidad del play
+Estado: backlog
+
+## Objetivo
+Permitir ajustar la velocidad de la simulacion continua.
+
+## Historia de Usuario
+Como usuario, quiero cambiar la velocidad del Play, para observar la evolucion a diferentes ritmos.
+
+## Criterios de Aceptacion
+- [ ] Existe un control de velocidad visible (slider o selector) en la UI.
+- [ ] Al modificar la velocidad durante Play, el temporizador ajusta el intervalo sin reiniciar la simulacion.
+- [ ] La velocidad seleccionada se aplica tambien al reanudar Play despues de Pause.
+
+## Fuera de Alcance
+- Zoom o redimension de la cuadricula.
+- Guardar/cargar patrones.
+- Modulo de IA.
+- Graficos de evolucion.
