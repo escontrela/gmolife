@@ -53,6 +53,18 @@ public final class GridState {
     }
   }
 
+  public int countAliveCells() {
+    int count = 0;
+    for (int row = 0; row < rows; row++) {
+      for (int column = 0; column < columns; column++) {
+        if (cells[row][column]) {
+          count++;
+        }
+      }
+    }
+    return count;
+  }
+
   private int countAliveNeighbors(int row, int column) {
     int count = 0;
     for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {

@@ -82,7 +82,7 @@ Como usuario, quiero reproducir y pausar la simulacion automaticamente, para obs
 - Modulo de IA.
 
 ## TASK-004 — Contadores de generacion y poblacion
-Estado: backlog
+Estado: done
 
 ## Objetivo
 Mostrar contadores de generacion y poblacion que se actualicen con cada tick.
@@ -91,9 +91,9 @@ Mostrar contadores de generacion y poblacion que se actualicen con cada tick.
 Como usuario, quiero ver la generacion actual y la cantidad de celulas vivas, para entender la evolucion del patron.
 
 ## Criterios de Aceptacion
-- [ ] La UI muestra un contador de generacion visible.
-- [ ] La UI muestra un contador de poblacion visible.
-- [ ] Ambos contadores se actualizan al usar Step y durante Play.
+- [x] La UI muestra un contador de generacion visible.
+- [x] La UI muestra un contador de poblacion visible.
+- [x] Ambos contadores se actualizan al usar Step y durante Play.
 
 ## Fuera de Alcance
 - Control de velocidad.
