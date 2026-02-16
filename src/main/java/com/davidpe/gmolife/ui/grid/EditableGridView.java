@@ -10,6 +10,7 @@ public final class EditableGridView extends GridPane {
 
   private final GridState gridState;
   private final double cellSize;
+  private Region[][] cellViews;
 
   public EditableGridView(GridState gridState, double cellSize) {
     this.gridState = gridState;
@@ -18,9 +19,11 @@ public final class EditableGridView extends GridPane {
   }
 
   private void buildCells() {
+    cellViews = new Region[gridState.getRows()][gridState.getColumns()];
     for (int row = 0; row < gridState.getRows(); row++) {
       for (int column = 0; column < gridState.getColumns(); column++) {
         Region cell = createCell(row, column);
+        cellViews[row][column] = cell;
         add(cell, column, row);
       }
     }
@@ -39,5 +42,13 @@ public final class EditableGridView extends GridPane {
 
   private void updateCellStyle(Region cell, boolean alive) {
     cell.setStyle(alive ? ALIVE_STYLE : DEAD_STYLE);
+  }
+
+  public void refresh() {
+    for (int row = 0; row < gridState.getRows(); row++) {
+      for (int column = 0; column < gridState.getColumns(); column++) {
+        updateCellStyle(cellViews[row][column], gridState.isAlive(row, column));
+      }
+    }
   }
 }
