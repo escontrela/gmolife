@@ -1,5 +1,6 @@
 package com.davidpe.gmolife.ui;
 
+import com.davidpe.gmolife.pattern.PatternIO;
 import com.davidpe.gmolife.ui.grid.EditableGridView;
 import com.davidpe.gmolife.ui.grid.GridState;
 import javafx.animation.KeyFrame;
@@ -9,6 +10,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -16,8 +18,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Random;
 
 public final class MainWindow {
@@ -45,8 +50,10 @@ public final class MainWindow {
   private Label populationValue;
   private Label speedValue;
   private XYChart.Series<Number, Number> populationSeries;
+  private Stage stage;
 
   public void show(Stage stage) {
+    this.stage = stage;
     BorderPane root = new BorderPane();
     root.setRight(buildPopulationPanel());
     root.setCenter(buildGrid());
@@ -76,6 +83,7 @@ public final class MainWindow {
     Button pauseButton = new Button("Pause");
     Button resetButton = new Button("Reset");
     Button randomizeButton = new Button("Randomize");
+    Button saveButton = new Button("Save");
     pauseButton.setDisable(true);
 
     timeline = new Timeline(new KeyFrame(Duration.millis(TICK_MILLIS), event -> {
@@ -146,13 +154,17 @@ public final class MainWindow {
       stepButton.setDisable(false);
     });
 
+    saveButton.setOnAction(event -> {
+      savePattern();
+    });
+
     Label generationLabel = new Label("Generacion:");
     generationValue = new Label("0");
     Label populationLabel = new Label("Poblacion:");
     populationValue = new Label("0");
     updateCounters();
 
-    HBox controls = new HBox(stepButton, playButton, pauseButton, resetButton, randomizeButton, speedLabel, speedSlider, speedValue, zoomLabel, zoomSlider, zoomValue, generationLabel, generationValue, populationLabel, populationValue);
+    HBox controls = new HBox(stepButton, playButton, pauseButton, resetButton, randomizeButton, saveButton, speedLabel, speedSlider, speedValue, zoomLabel, zoomSlider, zoomValue, generationLabel, generationValue, populationLabel, populationValue);
     controls.setPadding(new Insets(16));
     controls.setSpacing(12);
     return controls;
@@ -258,6 +270,55 @@ public final class MainWindow {
     generation = 0;
     gridView.refresh();
     updateCounters();
+  }
+
+  private void savePattern() {
+    if (stage == null) {
+      return;
+    }
+    FileChooser chooser = new FileChooser();
+    chooser.setTitle("Guardar patron");
+    chooser.getExtensionFilters().addAll(
+        new FileChooser.ExtensionFilter("Game of Life Pattern (*.gol)", "*.gol"),
+        new FileChooser.ExtensionFilter("Text file (*.txt)", "*.txt"),
+        new FileChooser.ExtensionFilter("All files (*.*)", "*.*"));
+    var file = chooser.showSaveDialog(stage);
+    if (file == null) {
+      return;
+    }
+    Path filePath = file.toPath();
+    try {
+      PatternIO.write(filePath, snapshotGrid());
+      showInfo("Patron guardado en " + filePath.getFileName() + ".");
+    } catch (IOException | IllegalArgumentException ex) {
+      showError("No se pudo guardar el patron: " + ex.getMessage());
+    }
+  }
+
+  private boolean[][] snapshotGrid() {
+    boolean[][] snapshot = new boolean[GRID_ROWS][GRID_COLUMNS];
+    for (int row = 0; row < GRID_ROWS; row++) {
+      for (int column = 0; column < GRID_COLUMNS; column++) {
+        snapshot[row][column] = gridState.isAlive(row, column);
+      }
+    }
+    return snapshot;
+  }
+
+  private void showInfo(String message) {
+    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    alert.setTitle("Game of Life");
+    alert.setHeaderText("Operacion completada");
+    alert.setContentText(message);
+    alert.showAndWait();
+  }
+
+  private void showError(String message) {
+    Alert alert = new Alert(Alert.AlertType.ERROR);
+    alert.setTitle("Game of Life");
+    alert.setHeaderText("Operacion fallida");
+    alert.setContentText(message);
+    alert.showAndWait();
   }
 
   private boolean[][] buildRandomPattern(double probability) {

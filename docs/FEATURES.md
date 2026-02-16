@@ -201,3 +201,23 @@ Como usuario, quiero hacer zoom en la cuadricula, para ver mas detalle o mas are
 - Guardar el zoom entre sesiones.
 - Pan o desplazamiento con drag.
 - Auto-ajuste por tamanio de ventana.
+
+## TASK-010 — Guardar patron a archivo
+Estado: done
+
+## Objetivo
+Permitir guardar el patron actual de la cuadricula en un archivo local.
+
+## Historia de Usuario
+Como usuario, quiero guardar mi patron en un archivo, para poder reutilizarlo mas tarde.
+
+## Criterios de Aceptacion
+- [x] Existe un boton "Save" o "Guardar" visible en la UI.
+- [x] Al presionar Save, se abre un selector de archivo para elegir ubicacion y nombre.
+- [x] El archivo se guarda en un formato de texto simple con dimensiones y celdas (0/1).
+- [x] Tras guardar, se muestra una confirmacion en la UI (toast, label o dialogo).
+
+## Fuera de Alcance
+- Formatos estandar como RLE.
+- Guardado automatico.
+- Versionado de patrones.
