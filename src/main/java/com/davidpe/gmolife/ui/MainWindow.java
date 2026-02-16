@@ -24,7 +24,9 @@ public final class MainWindow {
 
   private static final int GRID_ROWS = 25;
   private static final int GRID_COLUMNS = 25;
-  private static final double CELL_SIZE = 24;
+  private static final double DEFAULT_CELL_SIZE = 24;
+  private static final double MIN_CELL_SIZE = 12;
+  private static final double MAX_CELL_SIZE = 40;
   private static final int TICK_MILLIS = 300;
   private static final int MIN_TICK_MILLIS = 50;
   private static final int MAX_TICK_MILLIS = 1000;
@@ -47,8 +49,8 @@ public final class MainWindow {
   public void show(Stage stage) {
     BorderPane root = new BorderPane();
     root.setRight(buildPopulationPanel());
-    root.setTop(buildControls());
     root.setCenter(buildGrid());
+    root.setTop(buildControls());
 
     Scene scene = new Scene(root, 960, 640);
     stage.setTitle("Game of Life");
@@ -57,7 +59,7 @@ public final class MainWindow {
   }
 
   private StackPane buildGrid() {
-    gridView = new EditableGridView(gridState, CELL_SIZE);
+    gridView = new EditableGridView(gridState, DEFAULT_CELL_SIZE);
     gridView.setPadding(new Insets(24));
 
     StackPane container = new StackPane(gridView);
@@ -93,6 +95,21 @@ public final class MainWindow {
 
     speedSlider.valueProperty().addListener((obs, oldValue, newValue) -> {
       applySpeed(newValue.doubleValue());
+    });
+
+
+    Label zoomLabel = new Label("Zoom:");
+    Slider zoomSlider = new Slider(MIN_CELL_SIZE, MAX_CELL_SIZE, DEFAULT_CELL_SIZE);
+    zoomSlider.setShowTickLabels(true);
+    zoomSlider.setShowTickMarks(true);
+    zoomSlider.setMajorTickUnit(4);
+    zoomSlider.setMinorTickCount(3);
+    zoomSlider.setBlockIncrement(1);
+    Label zoomValue = new Label();
+    applyZoom(zoomSlider.getValue(), zoomValue);
+
+    zoomSlider.valueProperty().addListener((obs, oldValue, newValue) -> {
+      applyZoom(newValue.doubleValue(), zoomValue);
     });
 
     playButton.setOnAction(event -> {
@@ -135,7 +152,7 @@ public final class MainWindow {
     populationValue = new Label("0");
     updateCounters();
 
-    HBox controls = new HBox(stepButton, playButton, pauseButton, resetButton, randomizeButton, speedLabel, speedSlider, speedValue, generationLabel, generationValue, populationLabel, populationValue);
+    HBox controls = new HBox(stepButton, playButton, pauseButton, resetButton, randomizeButton, speedLabel, speedSlider, speedValue, zoomLabel, zoomSlider, zoomValue, generationLabel, generationValue, populationLabel, populationValue);
     controls.setPadding(new Insets(16));
     controls.setSpacing(12);
     return controls;
@@ -204,6 +221,16 @@ public final class MainWindow {
     if (timeline != null && tickMillis > 0) {
       double rate = TICK_MILLIS / tickMillis;
       timeline.setRate(rate);
+    }
+  }
+
+
+  private void applyZoom(double cellSize, Label zoomValue) {
+    if (zoomValue != null) {
+      zoomValue.setText(String.format("%.0f px", cellSize));
+    }
+    if (gridView != null && cellSize > 0) {
+      gridView.setCellSize(cellSize);
     }
   }
 

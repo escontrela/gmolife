@@ -11,7 +11,7 @@ public final class EditableGridView extends GridPane {
       "-fx-background-color: #2ecc71; -fx-border-color: #1f2d3a; -fx-border-width: 0.5;";
 
   private final GridState gridState;
-  private final double cellSize;
+  private double cellSize;
   private Region[][] cellViews;
 
   public EditableGridView(GridState gridState, double cellSize) {
@@ -33,7 +33,7 @@ public final class EditableGridView extends GridPane {
 
   private Region createCell(int row, int column) {
     Region cell = new Region();
-    cell.setPrefSize(cellSize, cellSize);
+    applyCellSize(cell);
     updateCellStyle(cell, gridState.isAlive(row, column));
     cell.setOnMouseClicked(
         event -> {
@@ -41,6 +41,23 @@ public final class EditableGridView extends GridPane {
           updateCellStyle(cell, gridState.isAlive(row, column));
         });
     return cell;
+  }
+
+  private void applyCellSize(Region cell) {
+    cell.setMinSize(cellSize, cellSize);
+    cell.setPrefSize(cellSize, cellSize);
+  }
+
+  public void setCellSize(double cellSize) {
+    this.cellSize = cellSize;
+    if (cellViews == null) {
+      return;
+    }
+    for (int row = 0; row < gridState.getRows(); row++) {
+      for (int column = 0; column < gridState.getColumns(); column++) {
+        applyCellSize(cellViews[row][column]);
+      }
+    }
   }
 
   private void updateCellStyle(Region cell, boolean alive) {

@@ -182,3 +182,22 @@ Como usuario, quiero ver una grafica de la poblacion por generacion mientras sim
 - Exportar la grafica a imagen o CSV.
 - Analiticas avanzadas o predicciones.
 - Integracion con modulo de IA.
+
+## TASK-009 — Zoom de cuadricula
+Estado: done
+
+## Objetivo
+Permitir acercar o alejar la cuadricula para mejorar la visualizacion.
+
+## Historia de Usuario
+Como usuario, quiero hacer zoom en la cuadricula, para ver mas detalle o mas area del tablero segun lo necesite.
+
+## Criterios de Aceptacion
+- [x] Existe un control de zoom (botones +/- o slider) visible en la UI.
+- [x] Al ajustar el zoom, las celdas cambian de tamanio sin distorsionar la cuadricula.
+- [x] El nivel de zoom se mantiene durante la sesion, incluso al hacer Reset.
+
+## Fuera de Alcance
+- Guardar el zoom entre sesiones.
+- Pan o desplazamiento con drag.
+- Auto-ajuste por tamanio de ventana.
