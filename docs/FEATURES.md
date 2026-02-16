@@ -282,3 +282,24 @@ Como usuario, quiero usar atajos de teclado, para operar la simulacion mas rapid
 - Atajos configurables.
 - Soporte para combos avanzados.
 - Atajos globales del sistema.
+
+## TASK-014 — Algoritmo genetico base en SimulationEngine
+Estado: done
+
+## Objetivo
+Agregar un algoritmo genetico minimo que busque un patron inicial con mejor fitness usando SimulationEngine.
+
+## Historia de Usuario
+Como usuario, quiero que el sistema proponga automaticamente patrones iniciales prometedores, para explorar configuraciones interesantes sin prueba y error manual.
+
+## Criterios de Aceptacion
+- [x] Se implementa un componente genetico en Java que genere una poblacion inicial de patrones binarios.
+- [x] Cada individuo se evalua ejecutando N generaciones con SimulationEngine y calculando fitness (poblacion media durante N ticks).
+- [x] Se aplican al menos operadores de seleccion, cruce y mutacion durante varias iteraciones.
+- [x] El proceso devuelve el mejor patron encontrado y su fitness numerico.
+- [x] La ejecucion es no bloqueante para UI (servicio en background o tarea asincrona).
+
+## Fuera de Alcance
+- Ajuste avanzado de hiperparametros desde UI.
+- Multiples objetivos de fitness.
+- Visualizacion grafica detallada del progreso genetico.
