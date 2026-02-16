@@ -4,6 +4,7 @@ import com.davidpe.gmolife.pattern.PatternData;
 import com.davidpe.gmolife.pattern.PatternIO;
 import com.davidpe.gmolife.ui.grid.EditableGridView;
 import com.davidpe.gmolife.ui.grid.GridState;
+import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.geometry.Insets;
@@ -20,6 +21,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -55,6 +58,10 @@ public final class MainWindow {
   private Label speedValue;
   private XYChart.Series<Number, Number> populationSeries;
   private Stage stage;
+  private Button stepButton;
+  private Button playButton;
+  private Button pauseButton;
+  private Button resetButton;
 
   public void show(Stage stage) {
     this.stage = stage;
@@ -64,6 +71,7 @@ public final class MainWindow {
     root.setTop(buildControls());
 
     Scene scene = new Scene(root, 960, 640);
+    setupKeyboardShortcuts(scene);
     stage.setTitle("Game of Life");
     stage.setScene(scene);
     stage.show();
@@ -79,13 +87,13 @@ public final class MainWindow {
   }
 
   private HBox buildControls() {
-    Button stepButton = new Button("Step");
+    stepButton = new Button("Step");
     stepButton.setOnAction(event -> {
-      advanceAndRefresh();
+      handleStep();
     });
-    Button playButton = new Button("Play");
-    Button pauseButton = new Button("Pause");
-    Button resetButton = new Button("Reset");
+    playButton = new Button("Play");
+    pauseButton = new Button("Pause");
+    resetButton = new Button("Reset");
     Button randomizeButton = new Button("Randomize");
     Button saveButton = new Button("Save");
     Button loadButton = new Button("Load");
@@ -126,29 +134,15 @@ public final class MainWindow {
     });
 
     playButton.setOnAction(event -> {
-      timeline.play();
-      playButton.setDisable(true);
-      pauseButton.setDisable(false);
-      stepButton.setDisable(true);
+      startPlay();
     });
 
     pauseButton.setOnAction(event -> {
-      timeline.pause();
-      playButton.setDisable(false);
-      pauseButton.setDisable(true);
-      stepButton.setDisable(false);
+      pausePlay();
     });
 
     resetButton.setOnAction(event -> {
-      timeline.stop();
-      generation = 0;
-      gridState.clear();
-      gridView.refresh();
-      resetPopulationSeries();
-      updateCounters();
-      playButton.setDisable(false);
-      pauseButton.setDisable(true);
-      stepButton.setDisable(false);
+      resetSimulation();
     });
 
     randomizeButton.setOnAction(event -> {
@@ -216,6 +210,88 @@ public final class MainWindow {
     generation++;
     gridView.refresh();
     updateCounters();
+  }
+
+  private void handleStep() {
+    if (stepButton != null && !stepButton.isDisabled()) {
+      advanceAndRefresh();
+    }
+  }
+
+  private void startPlay() {
+    if (timeline != null) {
+      timeline.play();
+    }
+    if (playButton != null) {
+      playButton.setDisable(true);
+    }
+    if (pauseButton != null) {
+      pauseButton.setDisable(false);
+    }
+    if (stepButton != null) {
+      stepButton.setDisable(true);
+    }
+  }
+
+  private void pausePlay() {
+    if (timeline != null) {
+      timeline.pause();
+    }
+    if (playButton != null) {
+      playButton.setDisable(false);
+    }
+    if (pauseButton != null) {
+      pauseButton.setDisable(true);
+    }
+    if (stepButton != null) {
+      stepButton.setDisable(false);
+    }
+  }
+
+  private void resetSimulation() {
+    if (timeline != null) {
+      timeline.stop();
+    }
+    generation = 0;
+    gridState.clear();
+    gridView.refresh();
+    resetPopulationSeries();
+    updateCounters();
+    if (playButton != null) {
+      playButton.setDisable(false);
+    }
+    if (pauseButton != null) {
+      pauseButton.setDisable(true);
+    }
+    if (stepButton != null) {
+      stepButton.setDisable(false);
+    }
+  }
+
+  private void setupKeyboardShortcuts(Scene scene) {
+    scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+      if (event.getCode() == KeyCode.SPACE) {
+        togglePlayPause();
+        event.consume();
+      } else if (event.getCode() == KeyCode.N) {
+        handleStep();
+        event.consume();
+      } else if (event.getCode() == KeyCode.R) {
+        resetSimulation();
+        event.consume();
+      }
+    });
+  }
+
+  private void togglePlayPause() {
+    if (timeline == null) {
+      return;
+    }
+    if (timeline.getStatus() == Animation.Status.RUNNING) {
+      pausePlay();
+    } else {
+      startPlay();
+    }
   }
 
   private void updateCounters() {

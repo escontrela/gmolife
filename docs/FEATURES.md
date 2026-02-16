@@ -262,3 +262,23 @@ Como usuario, quiero seleccionar patrones clasicos, para explorar comportamiento
 - Editor de patrones.
 - Importar patrones desde internet.
 - Guardar favoritos.
+
+## TASK-013 — Atajos de teclado principales
+Estado: done
+
+## Objetivo
+Permitir controlar la simulacion con atajos de teclado basicos.
+
+## Historia de Usuario
+Como usuario, quiero usar atajos de teclado, para operar la simulacion mas rapido.
+
+## Criterios de Aceptacion
+- [x] Barra espaciadora alterna Play/Pause.
+- [x] Tecla "N" ejecuta un Step.
+- [x] Tecla "R" ejecuta Reset.
+- [x] Los atajos funcionan cuando la ventana principal tiene foco.
+
+## Fuera de Alcance
+- Atajos configurables.
+- Soporte para combos avanzados.
+- Atajos globales del sistema.
