@@ -1,5 +1,6 @@
 package com.davidpe.gmolife.ui;
 
+import com.davidpe.gmolife.pattern.PatternData;
 import com.davidpe.gmolife.pattern.PatternIO;
 import com.davidpe.gmolife.ui.grid.EditableGridView;
 import com.davidpe.gmolife.ui.grid.GridState;
@@ -84,6 +85,7 @@ public final class MainWindow {
     Button resetButton = new Button("Reset");
     Button randomizeButton = new Button("Randomize");
     Button saveButton = new Button("Save");
+    Button loadButton = new Button("Load");
     pauseButton.setDisable(true);
 
     timeline = new Timeline(new KeyFrame(Duration.millis(TICK_MILLIS), event -> {
@@ -158,13 +160,17 @@ public final class MainWindow {
       savePattern();
     });
 
+    loadButton.setOnAction(event -> {
+      loadPattern();
+    });
+
     Label generationLabel = new Label("Generacion:");
     generationValue = new Label("0");
     Label populationLabel = new Label("Poblacion:");
     populationValue = new Label("0");
     updateCounters();
 
-    HBox controls = new HBox(stepButton, playButton, pauseButton, resetButton, randomizeButton, saveButton, speedLabel, speedSlider, speedValue, zoomLabel, zoomSlider, zoomValue, generationLabel, generationValue, populationLabel, populationValue);
+    HBox controls = new HBox(stepButton, playButton, pauseButton, resetButton, randomizeButton, saveButton, loadButton, speedLabel, speedSlider, speedValue, zoomLabel, zoomSlider, zoomValue, generationLabel, generationValue, populationLabel, populationValue);
     controls.setPadding(new Insets(16));
     controls.setSpacing(12);
     return controls;
@@ -292,6 +298,38 @@ public final class MainWindow {
       showInfo("Patron guardado en " + filePath.getFileName() + ".");
     } catch (IOException | IllegalArgumentException ex) {
       showError("No se pudo guardar el patron: " + ex.getMessage());
+    }
+  }
+
+  private void loadPattern() {
+    if (stage == null) {
+      return;
+    }
+    FileChooser chooser = new FileChooser();
+    chooser.setTitle("Cargar patron");
+    chooser.getExtensionFilters().addAll(
+        new FileChooser.ExtensionFilter("Game of Life Pattern (*.gol)", "*.gol"),
+        new FileChooser.ExtensionFilter("Text file (*.txt)", "*.txt"),
+        new FileChooser.ExtensionFilter("All files (*.*)", "*.*"));
+    var file = chooser.showOpenDialog(stage);
+    if (file == null) {
+      return;
+    }
+    Path filePath = file.toPath();
+    try {
+      PatternData data = PatternIO.read(filePath);
+      if (data.rows() != GRID_ROWS || data.columns() != GRID_COLUMNS) {
+        showError("El patron no coincide con el tamano de la cuadricula.");
+        return;
+      }
+      gridState.load(data.cells());
+      generation = 0;
+      gridView.refresh();
+      resetPopulationSeries();
+      updateCounters();
+      showInfo("Patron cargado desde " + filePath.getFileName() + ".");
+    } catch (IOException | IllegalArgumentException ex) {
+      showError("No se pudo cargar el patron: " + ex.getMessage());
     }
   }
 

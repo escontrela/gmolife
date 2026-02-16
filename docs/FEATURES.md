@@ -221,3 +221,24 @@ Como usuario, quiero guardar mi patron en un archivo, para poder reutilizarlo ma
 - Formatos estandar como RLE.
 - Guardado automatico.
 - Versionado de patrones.
+
+## TASK-011 — Cargar patron desde archivo
+Estado: done
+
+## Objetivo
+Permitir cargar un patron desde un archivo local y aplicarlo a la cuadricula.
+
+## Historia de Usuario
+Como usuario, quiero abrir un patron guardado, para continuar trabajando en el sin recrearlo.
+
+## Criterios de Aceptacion
+- [x] Existe un boton "Load" o "Abrir" visible en la UI.
+- [x] Al presionar Load, se abre un selector de archivo para elegir un archivo de patron.
+- [x] El archivo usa el mismo formato de texto simple definido en TASK-010.
+- [x] Al cargar, la cuadricula se actualiza y los contadores se recalculan (generacion=0, poblacion acorde).
+- [x] Si el archivo es invalido, se muestra un mensaje de error claro.
+
+## Fuera de Alcance
+- Soporte para multiples formatos.
+- Historial de archivos recientes.
+- Validacion avanzada del contenido.
