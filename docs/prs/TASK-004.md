@@ -13,7 +13,7 @@ Mostrar contadores de generacion y poblacion que se actualicen con cada tick.
 - Documentacion de TASK-004 en `docs/FEATURES.md`.
 
 ## Commits incluidos
-- `PENDIENTE`
+- `56856af` Add TASK-004 feature doc
 
 ## Checklist
 - [x] Ticket Tasker creado (`TASK-004`, id `36`)
