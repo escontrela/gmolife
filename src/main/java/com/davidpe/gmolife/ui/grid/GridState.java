@@ -35,6 +35,47 @@ public final class GridState {
     cells[row][column] = !cells[row][column];
   }
 
+  public void advance() {
+    boolean[][] next = new boolean[rows][columns];
+    for (int row = 0; row < rows; row++) {
+      for (int column = 0; column < columns; column++) {
+        int neighbors = countAliveNeighbors(row, column);
+        boolean alive = cells[row][column];
+        if (alive) {
+          next[row][column] = neighbors == 2 || neighbors == 3;
+        } else {
+          next[row][column] = neighbors == 3;
+        }
+      }
+    }
+    for (int row = 0; row < rows; row++) {
+      System.arraycopy(next[row], 0, cells[row], 0, columns);
+    }
+  }
+
+  private int countAliveNeighbors(int row, int column) {
+    int count = 0;
+    for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
+      for (int columnOffset = -1; columnOffset <= 1; columnOffset++) {
+        if (rowOffset == 0 && columnOffset == 0) {
+          continue;
+        }
+        int neighborRow = row + rowOffset;
+        int neighborColumn = column + columnOffset;
+        if (neighborRow < 0 || neighborRow >= rows) {
+          continue;
+        }
+        if (neighborColumn < 0 || neighborColumn >= columns) {
+          continue;
+        }
+        if (cells[neighborRow][neighborColumn]) {
+          count++;
+        }
+      }
+    }
+    return count;
+  }
+
   private void validateCoordinates(int row, int column) {
     Objects.checkIndex(row, rows);
     Objects.checkIndex(column, columns);
