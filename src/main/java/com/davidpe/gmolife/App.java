@@ -1,13 +1,13 @@
 package com.davidpe.gmolife;
 
-/**
- * Hello world!
- *
- */
-public class App 
-{
-    public static void main( String[] args )
-    {
-        System.out.println( "Hello World!" );
-    }
+import com.davidpe.gmolife.app.GameOfLifeApplication;
+
+public final class App {
+
+  private App() {
+  }
+
+  public static void main(String[] args) {
+    GameOfLifeApplication.main(args);
+  }
 }
