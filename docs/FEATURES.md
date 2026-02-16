@@ -140,3 +140,24 @@ Como usuario, quiero cambiar la velocidad del Play, para observar la evolucion a
 - Guardar/cargar patrones.
 - Modulo de IA.
 - Graficos de evolucion.
+
+## TASK-007 — Randomize inicial evolutivo
+Estado: done
+
+## Objetivo
+Agregar un boton Randomize que genere un patron inicial aleatorio con alta probabilidad de evolucion visible.
+
+## Historia de Usuario
+Como usuario, quiero randomizar la cuadricula con un patron que evolucione al presionar Play, para explorar comportamientos interesantes sin pintar celulas manualmente.
+
+## Criterios de Aceptacion
+- [x] Existe un boton "Randomize" visible en la UI principal.
+- [x] Al presionar Randomize, la cuadricula se rellena automaticamente con una distribucion aleatoria de celulas vivas/muertas.
+- [x] El algoritmo evita estados triviales (tablero vacio o totalmente lleno) y reintenta hasta obtener un patron valido.
+- [x] Al ejecutar 5 pasos de simulacion tras Randomize, se observa al menos un cambio de estado en la cuadricula.
+
+## Fuera de Alcance
+- Guardar/cargar semillas aleatorias.
+- Configuracion avanzada de probabilidad por el usuario.
+- Modulo de IA para optimizacion de patrones.
+- Graficos de evolucion.
