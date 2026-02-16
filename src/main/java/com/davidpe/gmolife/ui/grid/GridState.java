@@ -35,6 +35,23 @@ public final class GridState {
     cells[row][column] = !cells[row][column];
   }
 
+  public void setCell(int row, int column, boolean alive) {
+    validateCoordinates(row, column);
+    cells[row][column] = alive;
+  }
+
+  public void load(boolean[][] pattern) {
+    if (pattern.length != rows) {
+      throw new IllegalArgumentException("Pattern rows must match grid rows.");
+    }
+    for (int row = 0; row < rows; row++) {
+      if (pattern[row].length != columns) {
+        throw new IllegalArgumentException("Pattern columns must match grid columns.");
+      }
+      System.arraycopy(pattern[row], 0, cells[row], 0, columns);
+    }
+  }
+
   public void advance() {
     boolean[][] next = new boolean[rows][columns];
     for (int row = 0; row < rows; row++) {
