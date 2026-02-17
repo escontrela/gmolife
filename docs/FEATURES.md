@@ -974,3 +974,23 @@ Como usuario, quiero ver un resaltado al pasar el mouse sobre una celda, para sa
 - Seleccion multiple o rectangular.
 - Resaltado persistente de celdas vivas.
 - Cambios de tema o estilos avanzados.
+
+## TASK-046 — README funcional orientado a usuario
+Estado: done
+
+## Objetivo
+Crear un README claro y orientado a uso que explique las funcionalidades de la app.
+
+## Historia de Usuario
+Como usuario nuevo del proyecto, quiero leer un README claro y orientado a uso, para entender rapidamente que puedo hacer con la aplicacion.
+
+## Criterios de Aceptacion
+- [x] El README resume el proposito del proyecto en lenguaje no tecnico.
+- [x] Incluye una seccion de funcionalidades actuales con explicacion de utilidad para cada una.
+- [x] Describe los controles principales de la app (Play, Pause, Step, Reset, velocidad, zoom, guardar/cargar, etc.) y cuando usar cada opcion.
+- [x] Incluye una guia corta de uso recomendada (flujo basico de 5-8 pasos) para empezar a usar la app.
+- [x] Prioriza claridad para lector funcional y evita centrarse en arquitectura interna o detalles tecnicos de implementacion.
+- [x] El contenido refleja el estado real de features implementadas hasta la fecha.
+
+## Fuera de Alcance
+- Documentacion tecnica profunda o guia avanzada para contributors.
