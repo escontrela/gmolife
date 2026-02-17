@@ -77,6 +77,8 @@ public final class MainWindow {
   private Label populationValue;
   private Label speedValue;
   private XYChart.Series<Number, Number> populationSeries;
+  private XYChart.Series<Number, Number> birthsSeries;
+  private XYChart.Series<Number, Number> deathsSeries;
   private Stage stage;
   private Button stepButton;
   private Button playButton;
@@ -287,14 +289,20 @@ public final class MainWindow {
     yAxis.setLabel("Poblacion");
 
     LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
-    chart.setLegendVisible(false);
+    chart.setLegendVisible(true);
     chart.setCreateSymbols(false);
     chart.setAnimated(false);
     chart.setMinWidth(280);
     chart.setPrefWidth(320);
 
     populationSeries = new XYChart.Series<>();
+    populationSeries.setName("Poblacion");
+    birthsSeries = new XYChart.Series<>();
+    birthsSeries.setName("Nacimientos");
+    deathsSeries = new XYChart.Series<>();
+    deathsSeries.setName("Muertes");
     chart.getData().add(populationSeries);
+    chart.getData().addAll(birthsSeries, deathsSeries);
 
     VBox panel = new VBox(chart, buildAiPanel());
     panel.setPadding(new Insets(16));
@@ -378,10 +386,12 @@ public final class MainWindow {
   }
 
   private void advanceAndRefresh() {
+    boolean[][] before = snapshotGrid();
     gridState.advance();
     generation++;
     gridView.refresh();
     updateCounters();
+    updateBirthDeathSeries(before);
   }
 
   private void handleStep() {
@@ -494,6 +504,12 @@ public final class MainWindow {
   private void resetPopulationSeries() {
     if (populationSeries != null) {
       populationSeries.getData().clear();
+    }
+    if (birthsSeries != null) {
+      birthsSeries.getData().clear();
+    }
+    if (deathsSeries != null) {
+      deathsSeries.getData().clear();
     }
   }
 
@@ -892,13 +908,53 @@ public final class MainWindow {
   }
 
   private boolean[][] snapshotGrid() {
-    boolean[][] snapshot = new boolean[GRID_ROWS][GRID_COLUMNS];
-    for (int row = 0; row < GRID_ROWS; row++) {
-      for (int column = 0; column < GRID_COLUMNS; column++) {
+    int rows = gridState.getRows();
+    int columns = gridState.getColumns();
+    boolean[][] snapshot = new boolean[rows][columns];
+    for (int row = 0; row < rows; row++) {
+      for (int column = 0; column < columns; column++) {
         snapshot[row][column] = gridState.isAlive(row, column);
       }
     }
     return snapshot;
+  }
+
+  private void updateBirthDeathSeries(boolean[][] before) {
+    if (birthsSeries == null || deathsSeries == null || before == null) {
+      return;
+    }
+    int rows = before.length;
+    if (rows == 0) {
+      return;
+    }
+    int columns = before[0].length;
+    int births = 0;
+    int deaths = 0;
+    for (int row = 0; row < rows; row++) {
+      for (int column = 0; column < columns; column++) {
+        boolean wasAlive = before[row][column];
+        boolean isAlive = gridState.isAlive(row, column);
+        if (!wasAlive && isAlive) {
+          births++;
+        } else if (wasAlive && !isAlive) {
+          deaths++;
+        }
+      }
+    }
+    birthsSeries.getData().add(new XYChart.Data<>(generation, births));
+    deathsSeries.getData().add(new XYChart.Data<>(generation, deaths));
+    trimSeries(birthsSeries);
+    trimSeries(deathsSeries);
+  }
+
+  private void trimSeries(XYChart.Series<Number, Number> series) {
+    if (series == null) {
+      return;
+    }
+    int size = series.getData().size();
+    if (size > POPULATION_HISTORY) {
+      series.getData().remove(0, size - POPULATION_HISTORY);
+    }
   }
 
   private void showInfo(String message) {

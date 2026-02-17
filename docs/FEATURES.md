@@ -526,7 +526,7 @@ Como usuario, quiero ver el progreso actual de la IA mientras corre, para decidi
 - Notificaciones del sistema.
 
 ## TASK-022 — Grafica de nacimientos y muertes
-Estado: backlog
+Estado: done
 
 ## Objetivo
 Agregar series de nacimientos y muertes por generacion en la grafica de evolucion.
@@ -535,10 +535,10 @@ Agregar series de nacimientos y muertes por generacion en la grafica de evolucio
 Como usuario, quiero ver nacimientos y muertes por generacion, para entender mejor la dinamica del patron.
 
 ## Criterios de Aceptacion
-- [ ] La grafica incluye dos series adicionales: nacimientos y muertes por generacion.
-- [ ] Las series se actualizan al usar Step y durante Play.
-- [ ] Al pulsar Reset, las series se reinician.
-- [ ] Se mantienen como minimo los ultimos 100 puntos por serie.
+- [x] La grafica incluye dos series adicionales: nacimientos y muertes por generacion.
+- [x] Las series se actualizan al usar Step y durante Play.
+- [x] Al pulsar Reset, las series se reinician.
+- [x] Se mantienen como minimo los ultimos 100 puntos por serie.
 
 ## Fuera de Alcance
 - Estadisticas acumuladas o promedios.
