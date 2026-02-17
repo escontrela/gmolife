@@ -5,33 +5,6 @@ import com.davidpe.gmolife.pattern.PatternData;
 import com.davidpe.gmolife.pattern.PatternIO;
 import com.davidpe.gmolife.ui.grid.EditableGridView;
 import com.davidpe.gmolife.ui.grid.GridState;
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.SplitPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import javafx.util.Duration;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
@@ -39,6 +12,33 @@ import java.util.Random;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
+import javafx.scene.control.SplitPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public final class MainWindow {
 
@@ -119,21 +119,28 @@ public final class MainWindow {
 
     gridContainer = new StackPane(gridView);
     gridContainer.setPadding(new Insets(16));
-    gridContainer.widthProperty().addListener((obs, oldValue, newValue) -> {
-      updateGridSizing();
-    });
-    gridContainer.heightProperty().addListener((obs, oldValue, newValue) -> {
-      updateGridSizing();
-    });
+    gridContainer
+        .widthProperty()
+        .addListener(
+            (obs, oldValue, newValue) -> {
+              updateGridSizing();
+            });
+    gridContainer
+        .heightProperty()
+        .addListener(
+            (obs, oldValue, newValue) -> {
+              updateGridSizing();
+            });
     updateGridSizing();
     return gridContainer;
   }
 
   private FlowPane buildControls() {
     stepButton = new Button("Step");
-    stepButton.setOnAction(event -> {
-      handleStep();
-    });
+    stepButton.setOnAction(
+        event -> {
+          handleStep();
+        });
     playButton = new Button("Play");
     pauseButton = new Button("Pause");
     resetButton = new Button("Reset");
@@ -142,9 +149,13 @@ public final class MainWindow {
     Button loadButton = new Button("Load");
     pauseButton.setDisable(true);
 
-    timeline = new Timeline(new KeyFrame(Duration.millis(TICK_MILLIS), event -> {
-      advanceAndRefresh();
-    }));
+    timeline =
+        new Timeline(
+            new KeyFrame(
+                Duration.millis(TICK_MILLIS),
+                event -> {
+                  advanceAndRefresh();
+                }));
     timeline.setCycleCount(Timeline.INDEFINITE);
 
     Label speedLabel = new Label("Velocidad:");
@@ -158,10 +169,12 @@ public final class MainWindow {
     speedValue = new Label();
     applySpeed(speedSlider.getValue());
 
-    speedSlider.valueProperty().addListener((obs, oldValue, newValue) -> {
-      applySpeed(newValue.doubleValue());
-    });
-
+    speedSlider
+        .valueProperty()
+        .addListener(
+            (obs, oldValue, newValue) -> {
+              applySpeed(newValue.doubleValue());
+            });
 
     Label zoomLabel = new Label("Zoom:");
     Slider zoomSlider = new Slider(MIN_CELL_SIZE, MAX_CELL_SIZE, DEFAULT_CELL_SIZE);
@@ -174,48 +187,58 @@ public final class MainWindow {
     zoomValue = new Label();
     applyZoom(zoomSlider.getValue());
 
-    zoomSlider.valueProperty().addListener((obs, oldValue, newValue) -> {
-      applyZoom(newValue.doubleValue());
-    });
+    zoomSlider
+        .valueProperty()
+        .addListener(
+            (obs, oldValue, newValue) -> {
+              applyZoom(newValue.doubleValue());
+            });
 
-    playButton.setOnAction(event -> {
-      startPlay();
-    });
+    playButton.setOnAction(
+        event -> {
+          startPlay();
+        });
 
-    pauseButton.setOnAction(event -> {
-      pausePlay();
-    });
+    pauseButton.setOnAction(
+        event -> {
+          pausePlay();
+        });
 
-    resetButton.setOnAction(event -> {
-      resetSimulation();
-    });
+    resetButton.setOnAction(
+        event -> {
+          resetSimulation();
+        });
 
-    randomizeButton.setOnAction(event -> {
-      timeline.stop();
-      randomizeGrid();
-      playButton.setDisable(false);
-      pauseButton.setDisable(true);
-      stepButton.setDisable(false);
-    });
+    randomizeButton.setOnAction(
+        event -> {
+          timeline.stop();
+          randomizeGrid();
+          playButton.setDisable(false);
+          pauseButton.setDisable(true);
+          stepButton.setDisable(false);
+        });
 
-    saveButton.setOnAction(event -> {
-      savePattern();
-    });
+    saveButton.setOnAction(
+        event -> {
+          savePattern();
+        });
 
-    loadButton.setOnAction(event -> {
-      loadPattern();
-    });
+    loadButton.setOnAction(
+        event -> {
+          loadPattern();
+        });
 
     Label patternLabel = new Label("Patrones:");
     ComboBox<String> patternPicker = new ComboBox<>();
     patternPicker.getItems().addAll(BASIC_PATTERNS);
     patternPicker.setPromptText("Selecciona");
-    patternPicker.setOnAction(event -> {
-      String selection = patternPicker.getValue();
-      if (selection != null && !selection.isBlank()) {
-        loadPatternCentered(patternFor(selection));
-      }
-    });
+    patternPicker.setOnAction(
+        event -> {
+          String selection = patternPicker.getValue();
+          if (selection != null && !selection.isBlank()) {
+            loadPatternCentered(patternFor(selection));
+          }
+        });
 
     Label generationLabel = new Label("Generacion:");
     generationValue = new Label("0");
@@ -223,7 +246,27 @@ public final class MainWindow {
     populationValue = new Label("0");
     updateCounters();
 
-    FlowPane controls = new FlowPane(stepButton, playButton, pauseButton, resetButton, randomizeButton, saveButton, loadButton, patternLabel, patternPicker, speedLabel, speedSlider, speedValue, zoomLabel, zoomSlider, zoomValue, generationLabel, generationValue, populationLabel, populationValue);
+    FlowPane controls =
+        new FlowPane(
+            stepButton,
+            playButton,
+            pauseButton,
+            resetButton,
+            randomizeButton,
+            saveButton,
+            loadButton,
+            patternLabel,
+            patternPicker,
+            speedLabel,
+            speedSlider,
+            speedValue,
+            zoomLabel,
+            zoomSlider,
+            zoomValue,
+            generationLabel,
+            generationValue,
+            populationLabel,
+            populationValue);
     controls.setPadding(new Insets(16));
     controls.setHgap(12);
     controls.setVgap(8);
@@ -287,7 +330,16 @@ public final class MainWindow {
     previewContainer.setPadding(new Insets(8));
     previewContainer.setPrefSize(220, 220);
 
-    VBox panel = new VBox(title, aiRunButton, aiCancelButton, aiApplyButton, statusRow, fitnessRow, previewLabel, previewContainer);
+    VBox panel =
+        new VBox(
+            title,
+            aiRunButton,
+            aiCancelButton,
+            aiApplyButton,
+            statusRow,
+            fitnessRow,
+            previewLabel,
+            previewContainer);
     panel.setSpacing(8);
     panel.setPadding(new Insets(12, 0, 0, 0));
     return panel;
@@ -358,18 +410,20 @@ public final class MainWindow {
   }
 
   private void setupKeyboardShortcuts(Scene scene) {
-    scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-      if (event.getCode() == KeyCode.SPACE) {
-        togglePlayPause();
-        event.consume();
-      } else if (event.getCode() == KeyCode.N) {
-        handleStep();
-        event.consume();
-      } else if (event.getCode() == KeyCode.R) {
-        resetSimulation();
-        event.consume();
-      }
-    });
+    scene.addEventHandler(
+        KeyEvent.KEY_PRESSED,
+        event -> {
+          if (event.getCode() == KeyCode.SPACE) {
+            togglePlayPause();
+            event.consume();
+          } else if (event.getCode() == KeyCode.N) {
+            handleStep();
+            event.consume();
+          } else if (event.getCode() == KeyCode.R) {
+            resetSimulation();
+            event.consume();
+          }
+        });
   }
 
   private void togglePlayPause() {
@@ -421,7 +475,6 @@ public final class MainWindow {
     }
   }
 
-
   private void applyZoom(double cellSize) {
     desiredCellSize = cellSize;
     updateGridSizing();
@@ -444,18 +497,20 @@ public final class MainWindow {
       aiStatusValue.setText("Buscando...");
     }
     aiCancellationToken = new SimulationEngine.CancellationToken();
-    SimulationEngine.GeneticSearchConfig config = new SimulationEngine.GeneticSearchConfig(
-        GRID_ROWS,
-        GRID_COLUMNS,
-        AI_POPULATION_SIZE,
-        AI_GENERATIONS,
-        AI_EVALUATION_STEPS,
-        AI_MUTATION_RATE,
-        AI_CROSSOVER_RATE);
+    SimulationEngine.GeneticSearchConfig config =
+        new SimulationEngine.GeneticSearchConfig(
+            GRID_ROWS,
+            GRID_COLUMNS,
+            AI_POPULATION_SIZE,
+            AI_GENERATIONS,
+            AI_EVALUATION_STEPS,
+            AI_MUTATION_RATE,
+            AI_CROSSOVER_RATE);
     aiSearch = simulationEngine.findPromisingPattern(config, aiCancellationToken);
-    aiSearch.whenComplete((result, error) -> {
-      Platform.runLater(() -> handleAiSearchCompleted(result, error));
-    });
+    aiSearch.whenComplete(
+        (result, error) -> {
+          Platform.runLater(() -> handleAiSearchCompleted(result, error));
+        });
   }
 
   private void cancelAiSearch() {
@@ -473,7 +528,8 @@ public final class MainWindow {
     }
   }
 
-  private void handleAiSearchCompleted(SimulationEngine.GeneticSearchResult result, Throwable error) {
+  private void handleAiSearchCompleted(
+      SimulationEngine.GeneticSearchResult result, Throwable error) {
     if (aiRunButton != null) {
       aiRunButton.setDisable(false);
     }
@@ -568,11 +624,13 @@ public final class MainWindow {
       zoomValue.setText(String.format("%.0f px", clamped));
     }
   }
+
   private void randomizeGrid() {
     boolean[][] pattern = null;
     for (int attempt = 0; attempt < RANDOM_ATTEMPTS; attempt++) {
-      double probability = RANDOM_MIN_PROBABILITY
-          + random.nextDouble() * (RANDOM_MAX_PROBABILITY - RANDOM_MIN_PROBABILITY);
+      double probability =
+          RANDOM_MIN_PROBABILITY
+              + random.nextDouble() * (RANDOM_MAX_PROBABILITY - RANDOM_MIN_PROBABILITY);
       boolean[][] candidate = buildRandomPattern(probability);
       if (isTrivial(candidate)) {
         continue;
@@ -600,10 +658,12 @@ public final class MainWindow {
     }
     FileChooser chooser = new FileChooser();
     chooser.setTitle("Guardar patron");
-    chooser.getExtensionFilters().addAll(
-        new FileChooser.ExtensionFilter("Game of Life Pattern (*.gol)", "*.gol"),
-        new FileChooser.ExtensionFilter("Text file (*.txt)", "*.txt"),
-        new FileChooser.ExtensionFilter("All files (*.*)", "*.*"));
+    chooser
+        .getExtensionFilters()
+        .addAll(
+            new FileChooser.ExtensionFilter("Game of Life Pattern (*.gol)", "*.gol"),
+            new FileChooser.ExtensionFilter("Text file (*.txt)", "*.txt"),
+            new FileChooser.ExtensionFilter("All files (*.*)", "*.*"));
     var file = chooser.showSaveDialog(stage);
     if (file == null) {
       return;
@@ -623,10 +683,12 @@ public final class MainWindow {
     }
     FileChooser chooser = new FileChooser();
     chooser.setTitle("Cargar patron");
-    chooser.getExtensionFilters().addAll(
-        new FileChooser.ExtensionFilter("Game of Life Pattern (*.gol)", "*.gol"),
-        new FileChooser.ExtensionFilter("Text file (*.txt)", "*.txt"),
-        new FileChooser.ExtensionFilter("All files (*.*)", "*.*"));
+    chooser
+        .getExtensionFilters()
+        .addAll(
+            new FileChooser.ExtensionFilter("Game of Life Pattern (*.gol)", "*.gol"),
+            new FileChooser.ExtensionFilter("Text file (*.txt)", "*.txt"),
+            new FileChooser.ExtensionFilter("All files (*.*)", "*.*"));
     var file = chooser.showOpenDialog(stage);
     if (file == null) {
       return;
@@ -651,27 +713,26 @@ public final class MainWindow {
 
   private boolean[][] patternFor(String name) {
     return switch (name) {
-      case "Glider" -> new boolean[][]{
-          {false, true, false},
-          {false, false, true},
-          {true, true, true}
-      };
-      case "Blinker" -> new boolean[][]{
-          {true},
-          {true},
-          {true}
-      };
-      case "Toad" -> new boolean[][]{
-          {false, true, true, true},
-          {true, true, true, false}
-      };
-      case "Beacon" -> new boolean[][]{
-          {true, true, false, false},
-          {true, true, false, false},
-          {false, false, true, true},
-          {false, false, true, true}
-      };
-      default -> new boolean[][]{{true}};
+      case "Glider" ->
+          new boolean[][] {
+            {false, true, false},
+            {false, false, true},
+            {true, true, true}
+          };
+      case "Blinker" -> new boolean[][] {{true}, {true}, {true}};
+      case "Toad" ->
+          new boolean[][] {
+            {false, true, true, true},
+            {true, true, true, false}
+          };
+      case "Beacon" ->
+          new boolean[][] {
+            {true, true, false, false},
+            {true, true, false, false},
+            {false, false, true, true},
+            {false, false, true, true}
+          };
+      default -> new boolean[][] {{true}};
     };
   }
 
