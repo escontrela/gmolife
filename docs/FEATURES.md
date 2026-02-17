@@ -762,3 +762,23 @@ Como usuario, quiero pegar un patron desde el portapapeles, para cargar rapidame
 - Auto-deteccion de formatos alternativos.
 - Persistencia del portapapeles.
 - Historial de pegados.
+
+## TASK-035 — Tests unitarios para GridState y PatternIO
+Estado: done
+
+## Objetivo
+Agregar pruebas unitarias basicas para la logica de tablero y lectura/escritura de patrones.
+
+## Historia de Usuario
+Como equipo, quiero tests de GridState y PatternIO, para prevenir regresiones en reglas y parsing.
+
+## Criterios de Aceptacion
+- [x] Tests cubren reglas de avance en GridState (nace, sobrevive, muere).
+- [x] Tests cubren modo toroidal en bordes.
+- [x] Tests cubren serialize/parse de PatternIO con casos validos e invalidos.
+- [x] La suite pasa con `mvn test`.
+
+## Fuera de Alcance
+- Tests de UI JavaFX.
+- Benchmarks de rendimiento.
+- Coverage exhaustivo de IA.
