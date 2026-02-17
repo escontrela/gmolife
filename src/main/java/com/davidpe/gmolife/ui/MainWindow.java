@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -36,6 +39,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Slider;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
@@ -133,6 +137,7 @@ public final class MainWindow {
   private Label aiStatusValue;
   private Label aiObjectiveValue;
   private Label aiSeedValue;
+  private ListView<String> aiHistoryList;
   private Label statusMessage;
   private Label cursorPositionValue;
   private EditableGridView aiPreviewView;
@@ -142,6 +147,8 @@ public final class MainWindow {
   private TextField aiMutationField;
   private TextField aiSeedField;
   private ComboBox<SimulationEngine.GeneticObjective> aiObjectivePicker;
+  private final List<String> aiHistoryEntries = new ArrayList<>(5);
+  private SimulationEngine.GeneticObjective lastAiObjectiveUsed = AI_DEFAULT_OBJECTIVE;
   private CompletableFuture<SimulationEngine.GeneticSearchResult> aiSearch;
   private boolean[][] aiResultPattern;
   private SimulationEngine.CancellationToken aiCancellationToken;
@@ -560,6 +567,10 @@ public final class MainWindow {
     HBox seedValueRow = new HBox(seedValueLabel, aiSeedValue);
     seedValueRow.setSpacing(6);
 
+    Label historyLabel = new Label("Historial IA:");
+    aiHistoryList = new ListView<>();
+    aiHistoryList.setPrefHeight(140);
+
     Label previewLabel = new Label("Vista previa:");
     aiPreviewView = new EditableGridView(aiPreviewState, AI_PREVIEW_CELL_SIZE);
     aiPreviewView.setMouseTransparent(true);
@@ -585,7 +596,9 @@ public final class MainWindow {
             objectiveValueRow,
             seedValueRow,
             previewLabel,
-            aiPreviewContainer);
+            aiPreviewContainer,
+            historyLabel,
+            aiHistoryList);
     panel.setSpacing(8);
     panel.setPadding(new Insets(12, 0, 0, 0));
     return panel;
@@ -959,6 +972,7 @@ public final class MainWindow {
     if (aiObjectiveValue != null) {
       aiObjectiveValue.setText(formatObjective(objective));
     }
+    lastAiObjectiveUsed = objective;
     Long seed = resolveAiSeed();
     if (aiSeedValue != null) {
       aiSeedValue.setText(Long.toString(seed));
@@ -1045,6 +1059,7 @@ public final class MainWindow {
       aiApplyButton.setDisable(aiResultPattern == null);
     }
     updateAiPreview(aiResultPattern);
+    addAiHistoryEntry(result.fitness(), lastAiObjectiveUsed);
   }
 
   private void applyAiPattern() {
@@ -1062,6 +1077,21 @@ public final class MainWindow {
     if (aiFitnessValue != null) {
       aiFitnessValue.setText(String.format("%.2f", bestFitness));
     }
+  }
+
+  private void addAiHistoryEntry(double fitness, SimulationEngine.GeneticObjective objective) {
+    if (aiHistoryList == null) {
+      return;
+    }
+    String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    String entry =
+        String.format(
+            "%s | Objetivo: %s | Fitness: %.2f", timestamp, formatObjective(objective), fitness);
+    aiHistoryEntries.add(0, entry);
+    if (aiHistoryEntries.size() > 5) {
+      aiHistoryEntries.remove(aiHistoryEntries.size() - 1);
+    }
+    aiHistoryList.getItems().setAll(aiHistoryEntries);
   }
 
   private SimulationEngine.GeneticObjective resolveAiObjective() {

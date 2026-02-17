@@ -1034,3 +1034,23 @@ Como usuario, quiero ejecutar la IA con una semilla fija, para repetir resultado
 - Persistencia de historial largo de semillas.
 - Multiples semillas en lote.
 - Generador criptografico.
+
+## TASK-049 — Historial corto de resultados IA
+Estado: done
+
+## Objetivo
+Mostrar un historial breve de los ultimos resultados de IA para comparar ejecuciones.
+
+## Historia de Usuario
+Como usuario, quiero ver los ultimos resultados de IA, para decidir cual patron me conviene aplicar.
+
+## Criterios de Aceptacion
+- [x] La UI muestra una lista con las ultimas 5 ejecuciones de IA.
+- [x] Cada item incluye al menos: timestamp, objetivo usado y fitness final.
+- [x] El historial se actualiza al finalizar una ejecucion exitosa y no bloquea la UI.
+- [x] El historial se mantiene solo en memoria de sesion.
+
+## Fuera de Alcance
+- Persistencia entre sesiones.
+- Exportacion del historial.
+- Comparador visual avanzado entre patrones.
