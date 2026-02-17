@@ -1094,3 +1094,23 @@ Como usuario, quiero identificar rapidamente Play y Pause, para controlar la sim
 - Rediseno completo del tema de la aplicacion.
 - Cambios en shortcuts o logica del temporizador.
 - Nuevas animaciones de botones.
+
+## TASK-052 — Cambiar color de celulas vivas a azul
+Estado: done
+
+## Objetivo
+Cambiar el color de renderizado de las celulas vivas del grid de verde a azul.
+
+## Historia de Usuario
+Como usuario, quiero ver las celulas vivas en color azul, para ajustarlo a la identidad visual esperada.
+
+## Criterios de Aceptacion
+- [x] Las celulas vivas se muestran en azul en toda la cuadricula.
+- [x] Las celulas muertas mantienen su color actual sin regresiones visuales.
+- [x] El nuevo color azul se refleja durante edicion manual, Step y Play continuo.
+- [x] El cambio aplica tambien en patrones cargados/pegados y al aplicar resultado de IA.
+
+## Fuera de Alcance
+- Selector de color configurable por usuario.
+- Cambios de paleta global de la UI.
+- Soporte de multiples temas visuales.

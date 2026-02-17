@@ -7,7 +7,7 @@ import java.util.function.BiConsumer;
 public final class EditableGridView extends GridPane {
 
   private static final String DEAD_FILL = "#f5f6f7";
-  private static final String ALIVE_FILL = "#2ecc71";
+  private static final String ALIVE_FILL = "#2196f3";
   private static final String DEAD_BORDER = "#c7cdd1";
   private static final String ALIVE_BORDER = "#1f2d3a";
   private static final String HOVER_BORDER = "#f2b01e";
