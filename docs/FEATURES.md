@@ -384,3 +384,24 @@ Como usuario, quiero ver una vista previa del patron sugerido sin aplicarlo, par
 - Zoom o pan dentro de la vista previa.
 - Comparacion lado a lado con el patron actual.
 - Exportar la vista previa como imagen.
+
+## TASK-015 — Layout responsive resizable y maximizable
+Estado: done
+
+## Objetivo
+Hacer que la UI sea redimensionable y maximizable manteniendo todos los controles visibles y proporcionales.
+
+## Historia de Usuario
+Como usuario, quiero redimensionar o maximizar la ventana sin perder controles ni distorsionar la interfaz, para usar la aplicacion comodamente en distintos tamanios de pantalla.
+
+## Criterios de Aceptacion
+- [x] La ventana principal puede redimensionarse y maximizarse sin recortes de controles principales.
+- [x] La cuadricula, grafica y paneles se reacomodan proporcionalmente al cambiar el tamanio.
+- [x] Los botones (Play/Pause/Step/Reset/Randomize) y controles clave permanecen visibles y operables en ventana pequena y maximizada.
+- [x] Se definen tamanios minimos razonables para evitar colapsos de layout.
+- [x] El comportamiento de resize no degrada la interaccion (click en celdas, slider de velocidad y acciones principales).
+
+## Fuera de Alcance
+- Rediseño visual completo de estilos.
+- Modo multi-ventana.
+- Configuracion de layouts por usuario.

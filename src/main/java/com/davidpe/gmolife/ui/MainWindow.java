@@ -18,7 +18,9 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.SplitPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.input.KeyCode;
@@ -26,6 +28,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.geometry.Pos;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
@@ -38,6 +41,8 @@ public final class MainWindow {
   private static final double DEFAULT_CELL_SIZE = 24;
   private static final double MIN_CELL_SIZE = 12;
   private static final double MAX_CELL_SIZE = 40;
+  private static final double MIN_WINDOW_WIDTH = 900;
+  private static final double MIN_WINDOW_HEIGHT = 640;
   private static final int TICK_MILLIS = 300;
   private static final int MIN_TICK_MILLIS = 50;
   private static final int MAX_TICK_MILLIS = 1000;
@@ -62,18 +67,25 @@ public final class MainWindow {
   private Button playButton;
   private Button pauseButton;
   private Button resetButton;
+  private StackPane gridContainer;
+  private double desiredCellSize = DEFAULT_CELL_SIZE;
+  private Label zoomValue;
 
   public void show(Stage stage) {
     this.stage = stage;
     BorderPane root = new BorderPane();
-    root.setRight(buildPopulationPanel());
-    root.setCenter(buildGrid());
+    SplitPane content = new SplitPane();
+    content.getItems().addAll(buildGrid(), buildPopulationPanel());
+    content.setDividerPositions(0.68);
+    root.setCenter(content);
     root.setTop(buildControls());
 
     Scene scene = new Scene(root, 960, 640);
     setupKeyboardShortcuts(scene);
     stage.setTitle("Game of Life");
     stage.setScene(scene);
+    stage.setMinWidth(MIN_WINDOW_WIDTH);
+    stage.setMinHeight(MIN_WINDOW_HEIGHT);
     stage.show();
   }
 
@@ -81,12 +93,19 @@ public final class MainWindow {
     gridView = new EditableGridView(gridState, DEFAULT_CELL_SIZE);
     gridView.setPadding(new Insets(24));
 
-    StackPane container = new StackPane(gridView);
-    container.setPadding(new Insets(16));
-    return container;
+    gridContainer = new StackPane(gridView);
+    gridContainer.setPadding(new Insets(16));
+    gridContainer.widthProperty().addListener((obs, oldValue, newValue) -> {
+      updateGridSizing();
+    });
+    gridContainer.heightProperty().addListener((obs, oldValue, newValue) -> {
+      updateGridSizing();
+    });
+    updateGridSizing();
+    return gridContainer;
   }
 
-  private HBox buildControls() {
+  private FlowPane buildControls() {
     stepButton = new Button("Step");
     stepButton.setOnAction(event -> {
       handleStep();
@@ -111,6 +130,7 @@ public final class MainWindow {
     speedSlider.setMajorTickUnit(250);
     speedSlider.setMinorTickCount(4);
     speedSlider.setBlockIncrement(50);
+    speedSlider.setPrefWidth(160);
     speedValue = new Label();
     applySpeed(speedSlider.getValue());
 
@@ -126,11 +146,12 @@ public final class MainWindow {
     zoomSlider.setMajorTickUnit(4);
     zoomSlider.setMinorTickCount(3);
     zoomSlider.setBlockIncrement(1);
-    Label zoomValue = new Label();
-    applyZoom(zoomSlider.getValue(), zoomValue);
+    zoomSlider.setPrefWidth(160);
+    zoomValue = new Label();
+    applyZoom(zoomSlider.getValue());
 
     zoomSlider.valueProperty().addListener((obs, oldValue, newValue) -> {
-      applyZoom(newValue.doubleValue(), zoomValue);
+      applyZoom(newValue.doubleValue());
     });
 
     playButton.setOnAction(event -> {
@@ -178,9 +199,11 @@ public final class MainWindow {
     populationValue = new Label("0");
     updateCounters();
 
-    HBox controls = new HBox(stepButton, playButton, pauseButton, resetButton, randomizeButton, saveButton, loadButton, patternLabel, patternPicker, speedLabel, speedSlider, speedValue, zoomLabel, zoomSlider, zoomValue, generationLabel, generationValue, populationLabel, populationValue);
+    FlowPane controls = new FlowPane(stepButton, playButton, pauseButton, resetButton, randomizeButton, saveButton, loadButton, patternLabel, patternPicker, speedLabel, speedSlider, speedValue, zoomLabel, zoomSlider, zoomValue, generationLabel, generationValue, populationLabel, populationValue);
     controls.setPadding(new Insets(16));
-    controls.setSpacing(12);
+    controls.setHgap(12);
+    controls.setVgap(8);
+    controls.setAlignment(Pos.CENTER_LEFT);
     return controls;
   }
 
@@ -195,13 +218,16 @@ public final class MainWindow {
     chart.setLegendVisible(false);
     chart.setCreateSymbols(false);
     chart.setAnimated(false);
-    chart.setMinWidth(320);
+    chart.setMinWidth(280);
+    chart.setPrefWidth(320);
 
     populationSeries = new XYChart.Series<>();
     chart.getData().add(populationSeries);
 
     VBox panel = new VBox(chart);
     panel.setPadding(new Insets(16));
+    panel.setMinWidth(280);
+    VBox.setVgrow(chart, Priority.ALWAYS);
     return panel;
   }
 
@@ -333,15 +359,42 @@ public final class MainWindow {
   }
 
 
-  private void applyZoom(double cellSize, Label zoomValue) {
-    if (zoomValue != null) {
-      zoomValue.setText(String.format("%.0f px", cellSize));
-    }
-    if (gridView != null && cellSize > 0) {
-      gridView.setCellSize(cellSize);
-    }
+  private void applyZoom(double cellSize) {
+    desiredCellSize = cellSize;
+    updateGridSizing();
   }
 
+  private void updateGridSizing() {
+    if (gridView == null || gridContainer == null) {
+      return;
+    }
+    double availableWidth = gridContainer.getWidth();
+    double availableHeight = gridContainer.getHeight();
+    if (availableWidth <= 0 || availableHeight <= 0) {
+      return;
+    }
+    Insets containerPadding = gridContainer.getPadding();
+    if (containerPadding != null) {
+      availableWidth -= containerPadding.getLeft() + containerPadding.getRight();
+      availableHeight -= containerPadding.getTop() + containerPadding.getBottom();
+    }
+    Insets gridPadding = gridView.getPadding();
+    if (gridPadding != null) {
+      availableWidth -= gridPadding.getLeft() + gridPadding.getRight();
+      availableHeight -= gridPadding.getTop() + gridPadding.getBottom();
+    }
+    if (availableWidth <= 0 || availableHeight <= 0) {
+      return;
+    }
+    double fitByWidth = availableWidth / GRID_COLUMNS;
+    double fitByHeight = availableHeight / GRID_ROWS;
+    double fitCellSize = Math.min(fitByWidth, fitByHeight);
+    double clamped = Math.max(MIN_CELL_SIZE, Math.min(desiredCellSize, fitCellSize));
+    gridView.setCellSize(clamped);
+    if (zoomValue != null) {
+      zoomValue.setText(String.format("%.0f px", clamped));
+    }
+  }
   private void randomizeGrid() {
     boolean[][] pattern = null;
     for (int attempt = 0; attempt < RANDOM_ATTEMPTS; attempt++) {
