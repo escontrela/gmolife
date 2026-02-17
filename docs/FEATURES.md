@@ -800,3 +800,22 @@ Como usuario, quiero ver el estado actual de la simulacion, para saber si esta c
 ## Fuera de Alcance
 - Animaciones avanzadas del indicador.
 - Persistencia del estado entre sesiones.
+
+## TASK-038 — Confirmacion al cargar patron con tablero no vacio
+Estado: done
+
+## Objetivo
+Evitar perder trabajo al cargar un patron cuando hay celdas vivas.
+
+## Historia de Usuario
+Como usuario, quiero confirmar la carga si tengo un patron en pantalla, para no sobrescribirlo por error.
+
+## Criterios de Aceptacion
+- [x] Si el tablero tiene al menos una celda viva, Load muestra un dialogo de confirmacion.
+- [x] Si el usuario confirma, se carga el patron como hoy.
+- [x] Si el usuario cancela, la cuadricula y contadores permanecen intactos.
+- [x] Si el tablero esta vacio, Load se ejecuta sin dialogo.
+
+## Fuera de Alcance
+- Confirmaciones para Save o Export.
+- Preferencias persistentes de confirmacion.

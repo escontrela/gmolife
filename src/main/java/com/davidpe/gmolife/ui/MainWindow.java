@@ -1126,6 +1126,9 @@ public final class MainWindow {
     if (stage == null) {
       return;
     }
+    if (!confirmLoadIfNeeded()) {
+      return;
+    }
     FileChooser chooser = new FileChooser();
     chooser.setTitle("Cargar patron");
     chooser
@@ -1155,6 +1158,21 @@ public final class MainWindow {
     } catch (IOException | IllegalArgumentException ex) {
       showError("No se pudo cargar el patron: " + ex.getMessage());
     }
+  }
+
+  private boolean confirmLoadIfNeeded() {
+    if (gridState.countAliveCells() == 0) {
+      return true;
+    }
+    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    alert.setTitle("Game of Life");
+    alert.setHeaderText("Confirmar carga");
+    alert.setContentText("Hay celdas vivas en el tablero. ¿Deseas cargar otro patron?");
+    ButtonType confirm = new ButtonType("Cargar");
+    ButtonType cancel = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
+    alert.getButtonTypes().setAll(confirm, cancel);
+    Optional<ButtonType> result = alert.showAndWait();
+    return result.isPresent() && result.get() == confirm;
   }
 
   private void exportPopulationCsv() {
