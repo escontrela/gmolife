@@ -41,6 +41,8 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
@@ -190,6 +192,7 @@ public final class MainWindow {
     Button saveButton = new Button("Save");
     Button loadButton = new Button("Load");
     Button exportPngButton = new Button("Exportar PNG");
+    Button copyPatternButton = new Button("Copiar patron");
     pauseButton.setDisable(true);
 
     timeline =
@@ -306,6 +309,11 @@ public final class MainWindow {
           exportGridPng();
         });
 
+    copyPatternButton.setOnAction(
+        event -> {
+          copyPatternToClipboard();
+        });
+
     Label patternLabel = new Label("Patrones:");
     ComboBox<String> patternPicker = new ComboBox<>();
     patternPicker.getItems().addAll(BASIC_PATTERNS);
@@ -342,6 +350,7 @@ public final class MainWindow {
             saveButton,
             loadButton,
             exportPngButton,
+            copyPatternButton,
             patternLabel,
             patternPicker,
             speedLabel,
@@ -1302,6 +1311,18 @@ public final class MainWindow {
       showInfo("PNG guardado en " + file.getName() + ".");
     } catch (IOException ex) {
       showError("No se pudo exportar el PNG: " + ex.getMessage());
+    }
+  }
+
+  private void copyPatternToClipboard() {
+    try {
+      String serialized = PatternIO.serialize(snapshotGrid());
+      ClipboardContent content = new ClipboardContent();
+      content.putString(serialized);
+      Clipboard.getSystemClipboard().setContent(content);
+      showInfo("Patron copiado al portapapeles.");
+    } catch (IllegalArgumentException ex) {
+      showError("No se pudo copiar el patron: " + ex.getMessage());
     }
   }
 

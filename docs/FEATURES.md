@@ -722,3 +722,23 @@ Como usuario, quiero exportar una imagen del patron actual, para compartirlo o d
 - Exportar animaciones o multiples frames.
 - Formatos alternativos (SVG, JPG).
 - Exportacion automatica.
+
+## TASK-033 — Copiar patron al portapapeles
+Estado: done
+
+## Objetivo
+Permitir copiar el patron actual en formato de texto al portapapeles.
+
+## Historia de Usuario
+Como usuario, quiero copiar el patron actual al portapapeles, para compartirlo rapidamente sin guardar un archivo.
+
+## Criterios de Aceptacion
+- [x] Existe un boton "Copiar patron" en la UI.
+- [x] Al presionarlo, se copia el texto en el mismo formato que PatternIO.
+- [x] Se muestra una confirmacion visual de copia exitosa.
+- [x] Si ocurre un error, se muestra un mensaje claro.
+
+## Fuera de Alcance
+- Formatos alternativos (RLE, JSON).
+- Copiar solo la seleccion.
+- Historial de copiados.
