@@ -584,3 +584,22 @@ Como usuario, quiero activar el modo toroidal, para que los bordes se conecten y
 - Multiples modos de frontera.
 - Persistencia del modo entre sesiones.
 - Visualizacion especial de bordes.
+
+## TASK-025 — Indicador de IA en ejecucion
+Estado: done
+
+## Objetivo
+Mostrar claramente cuando la IA esta ejecutandose para evitar acciones duplicadas.
+
+## Historia de Usuario
+Como usuario, quiero un indicador visual de IA en curso, para saber que la busqueda esta activa.
+
+## Criterios de Aceptacion
+- [x] Al iniciar la IA, aparece un indicador visible con texto "IA en ejecucion".
+- [x] El indicador desaparece al terminar o cancelar la ejecucion.
+- [x] Mientras la IA corre, el boton Run/Buscar queda deshabilitado para evitar ejecuciones simultaneas.
+
+## Fuera de Alcance
+- Barra de progreso detallada.
+- Notificaciones del sistema.
+- Multiples ejecuciones concurrentes.

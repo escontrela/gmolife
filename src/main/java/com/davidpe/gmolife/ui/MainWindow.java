@@ -99,6 +99,7 @@ public final class MainWindow {
   private Button aiRunButton;
   private Button aiCancelButton;
   private Button aiApplyButton;
+  private Label aiRunningIndicator;
   private Label aiFitnessValue;
   private Label aiIterationValue;
   private Label aiStatusValue;
@@ -359,6 +360,16 @@ public final class MainWindow {
     aiApplyButton.setDisable(true);
     aiApplyButton.setOnAction(event -> applyAiPattern());
 
+    aiRunningIndicator = new Label("IA en ejecucion");
+    aiRunningIndicator.setStyle(
+        "-fx-background-color: #f7d07a; "
+            + "-fx-text-fill: #3b2f00; "
+            + "-fx-padding: 4 8; "
+            + "-fx-background-radius: 6; "
+            + "-fx-font-size: 11;");
+    aiRunningIndicator.setVisible(false);
+    aiRunningIndicator.setManaged(false);
+
     Label populationLabel = new Label("Poblacion:");
     aiPopulationField = new TextField(Integer.toString(AI_POPULATION_SIZE));
     aiPopulationField.setPrefColumnCount(6);
@@ -402,6 +413,7 @@ public final class MainWindow {
     VBox panel =
         new VBox(
             title,
+            aiRunningIndicator,
             aiRunButton,
             aiCancelButton,
             aiApplyButton,
@@ -644,6 +656,7 @@ public final class MainWindow {
     if (aiRunButton != null) {
       aiRunButton.setDisable(true);
     }
+    setAiRunningIndicator(true);
     if (aiCancelButton != null) {
       aiCancelButton.setDisable(false);
     }
@@ -690,6 +703,7 @@ public final class MainWindow {
     if (aiSearch != null) {
       aiSearch.cancel(true);
     }
+    setAiRunningIndicator(false);
     if (aiCancelButton != null) {
       aiCancelButton.setDisable(true);
     }
@@ -706,6 +720,7 @@ public final class MainWindow {
     if (aiCancelButton != null) {
       aiCancelButton.setDisable(true);
     }
+    setAiRunningIndicator(false);
     if (error != null) {
       Throwable cause = error instanceof CompletionException ? error.getCause() : error;
       if (cause instanceof CancellationException) {
@@ -754,6 +769,14 @@ public final class MainWindow {
     if (aiFitnessValue != null) {
       aiFitnessValue.setText(String.format("%.2f", bestFitness));
     }
+  }
+
+  private void setAiRunningIndicator(boolean running) {
+    if (aiRunningIndicator == null) {
+      return;
+    }
+    aiRunningIndicator.setVisible(running);
+    aiRunningIndicator.setManaged(running);
   }
 
   private void updateAiPreview(boolean[][] pattern) {
