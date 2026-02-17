@@ -129,6 +129,7 @@ public final class MainWindow {
   private Label aiFitnessValue;
   private Label aiIterationValue;
   private Label aiStatusValue;
+  private Label statusMessage;
   private EditableGridView aiPreviewView;
   private StackPane aiPreviewContainer;
   private TextField aiPopulationField;
@@ -146,6 +147,7 @@ public final class MainWindow {
     content.setDividerPositions(0.68);
     root.setCenter(content);
     root.setTop(buildControls());
+    root.setBottom(buildStatusBar());
 
     Scene scene = new Scene(root, 960, 640);
     setupKeyboardShortcuts(scene);
@@ -427,6 +429,17 @@ public final class MainWindow {
     panel.setMinWidth(280);
     VBox.setVgrow(chart, Priority.ALWAYS);
     return panel;
+  }
+
+  private HBox buildStatusBar() {
+    Label statusLabel = new Label("Estado:");
+    statusMessage = new Label("Listo");
+    HBox statusBar = new HBox(statusLabel, statusMessage);
+    statusBar.setSpacing(8);
+    statusBar.setPadding(new Insets(8, 16, 8, 16));
+    statusBar.setAlignment(Pos.CENTER_LEFT);
+    HBox.setHgrow(statusMessage, Priority.ALWAYS);
+    return statusBar;
   }
 
   private VBox buildAiPanel() {
@@ -1326,19 +1339,19 @@ public final class MainWindow {
   }
 
   private void showInfo(String message) {
-    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-    alert.setTitle("Game of Life");
-    alert.setHeaderText("Operacion completada");
-    alert.setContentText(message);
-    alert.showAndWait();
+    setStatusMessage(message, false);
   }
 
   private void showError(String message) {
-    Alert alert = new Alert(Alert.AlertType.ERROR);
-    alert.setTitle("Game of Life");
-    alert.setHeaderText("Operacion fallida");
-    alert.setContentText(message);
-    alert.showAndWait();
+    setStatusMessage(message, true);
+  }
+
+  private void setStatusMessage(String message, boolean error) {
+    if (statusMessage == null) {
+      return;
+    }
+    statusMessage.setText(message);
+    statusMessage.setStyle(error ? "-fx-text-fill: #b00020;" : "-fx-text-fill: #1b5e20;");
   }
 
   private void exportGridPng() {

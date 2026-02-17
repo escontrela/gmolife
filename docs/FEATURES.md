@@ -837,3 +837,22 @@ Como usuario, quiero que la simulacion se pause si edito celdas, para evitar res
 ## Fuera de Alcance
 - Opcion para desactivar este comportamiento.
 - Edicion durante Play sin pausa.
+
+## TASK-040 — Barra de estado para mensajes de acciones
+Estado: done
+
+## Objetivo
+Mostrar mensajes breves de acciones (guardar, cargar, copiar, exportar) en una barra de estado.
+
+## Historia de Usuario
+Como usuario, quiero ver confirmaciones y errores en una barra de estado, para entender rapidamente el resultado de una accion.
+
+## Criterios de Aceptacion
+- [x] La UI incluye una barra de estado visible en la ventana principal.
+- [x] Al guardar, cargar, copiar o exportar, se muestra un mensaje de exito o error.
+- [x] Los mensajes se reemplazan por el mas reciente y no bloquean la UI.
+
+## Fuera de Alcance
+- Historial de mensajes.
+- Notificaciones del sistema.
+- Persistencia del ultimo mensaje.
