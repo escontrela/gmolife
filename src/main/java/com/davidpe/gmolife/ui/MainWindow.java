@@ -17,7 +17,6 @@ import java.util.Random;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import javax.imageio.ImageIO;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -54,6 +53,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javax.imageio.ImageIO;
 
 public final class MainWindow {
 
@@ -192,7 +192,7 @@ public final class MainWindow {
   private void configureGridView(EditableGridView view) {
     view.setOnEdit(this::pauseIfEditingDuringPlay);
     view.setPadding(new Insets(24));
-    view.setGridLinesVisible(gridLinesVisible);
+    view.setCellGridLinesVisible(gridLinesVisible);
     view.setOnHover(this::updateCursorPosition);
     view.setOnHoverExit(this::clearCursorPosition);
   }
@@ -291,7 +291,7 @@ public final class MainWindow {
         event -> {
           gridLinesVisible = gridLinesToggle.isSelected();
           if (gridView != null) {
-            gridView.setGridLinesVisible(gridLinesVisible);
+            gridView.setCellGridLinesVisible(gridLinesVisible);
           }
         });
 
@@ -851,12 +851,7 @@ public final class MainWindow {
     try {
       int value = Integer.parseInt(raw.trim());
       if (value < 1) {
-        showError(
-            "El valor de "
-                + label
-                + " debe ser al menos 1. Se usara "
-                + fallback
-                + ".");
+        showError("El valor de " + label + " debe ser al menos 1. Se usara " + fallback + ".");
         field.setText(Integer.toString(fallback));
         return fallback;
       }

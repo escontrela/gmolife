@@ -121,7 +121,7 @@ public final class EditableGridView extends GridPane {
     cell.setStyle(styleFor(alive, hovered));
   }
 
-  public void setGridLinesVisible(boolean visible) {
+  public void setCellGridLinesVisible(boolean visible) {
     gridLinesVisible = visible;
     refresh();
   }
