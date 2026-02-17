@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
@@ -26,6 +27,8 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -525,6 +528,9 @@ public final class MainWindow {
   }
 
   private void resetSimulation() {
+    if (!confirmResetIfNeeded()) {
+      return;
+    }
     if (timeline != null) {
       timeline.stop();
     }
@@ -545,6 +551,21 @@ public final class MainWindow {
     if (stepButton != null) {
       stepButton.setDisable(false);
     }
+  }
+
+  private boolean confirmResetIfNeeded() {
+    if (gridState.countAliveCells() == 0) {
+      return true;
+    }
+    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    alert.setTitle("Game of Life");
+    alert.setHeaderText("Confirmar reset");
+    alert.setContentText("Hay celdas vivas en el tablero. ¿Deseas reiniciar?");
+    ButtonType confirm = new ButtonType("Reset");
+    ButtonType cancel = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
+    alert.getButtonTypes().setAll(confirm, cancel);
+    Optional<ButtonType> result = alert.showAndWait();
+    return result.isPresent() && result.get() == confirm;
   }
 
   private void setupKeyboardShortcuts(Scene scene) {

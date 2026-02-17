@@ -683,3 +683,22 @@ Como usuario, quiero ver min/max/promedio de poblacion, para entender mejor la e
 - Estadisticas por ventana de tiempo.
 - Exportar estadisticas.
 - Comparativas entre ejecuciones.
+
+## TASK-031 — Confirmacion de reset con tablero no vacio
+Estado: done
+
+## Objetivo
+Evitar resets accidentales cuando hay celdas vivas en el tablero.
+
+## Historia de Usuario
+Como usuario, quiero confirmar el reset si tengo un patron en pantalla, para no perder trabajo por error.
+
+## Criterios de Aceptacion
+- [x] Si el tablero tiene al menos una celda viva, Reset muestra un dialogo de confirmacion.
+- [x] Si el usuario confirma, se ejecuta Reset como hoy.
+- [x] Si el usuario cancela, el tablero y contadores permanecen intactos.
+- [x] Si el tablero esta vacio, Reset se ejecuta sin dialogo.
+
+## Fuera de Alcance
+- Preferencias persistentes de confirmacion.
+- Confirmaciones para otras acciones (Load, Randomize).
