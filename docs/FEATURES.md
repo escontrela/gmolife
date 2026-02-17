@@ -914,3 +914,23 @@ Como usuario, quiero confirmar la salida si tengo un patron en pantalla, para no
 - Guardado automatico al salir.
 - Preferencias persistentes de confirmacion.
 - Confirmaciones para otras acciones (Load, Reset).
+
+## TASK-043 — Boton para centrar patron
+Estado: done
+
+## Objetivo
+Agregar una accion que centre el patron actual dentro de la cuadricula.
+
+## Historia de Usuario
+Como usuario, quiero centrar el patron con un clic, para mantenerlo visible y ordenado en pantalla.
+
+## Criterios de Aceptacion
+- [x] Existe un boton "Centrar" visible en la UI.
+- [x] Al pulsarlo, el patron vivo se traslada para quedar centrado en la cuadricula.
+- [x] La poblacion no cambia tras centrar.
+- [x] La UI se actualiza inmediatamente y los contadores se mantienen.
+
+## Fuera de Alcance
+- Cambiar tamano de la cuadricula.
+- Rotar o espejar el patron.
+- Centrado automatico continuo.

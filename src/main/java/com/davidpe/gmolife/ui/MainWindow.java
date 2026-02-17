@@ -207,6 +207,7 @@ public final class MainWindow {
     pauseButton = new Button("Pause");
     resetButton = new Button("Reset");
     Button randomizeButton = new Button("Randomize");
+    Button centerButton = new Button("Centrar");
     Button saveButton = new Button("Save");
     Button loadButton = new Button("Load");
     Button exportPngButton = new Button("Exportar PNG");
@@ -317,6 +318,11 @@ public final class MainWindow {
           stepButton.setDisable(false);
         });
 
+    centerButton.setOnAction(
+        event -> {
+          centerPattern();
+        });
+
     saveButton.setOnAction(
         event -> {
           savePattern();
@@ -375,6 +381,7 @@ public final class MainWindow {
             pauseButton,
             resetButton,
             randomizeButton,
+            centerButton,
             playStateRow,
             saveButton,
             loadButton,
@@ -1139,6 +1146,43 @@ public final class MainWindow {
     gridView.refresh();
     updateCounters();
     resetPopulationStats();
+  }
+
+  private void centerPattern() {
+    int rows = gridState.getRows();
+    int columns = gridState.getColumns();
+    int minRow = rows;
+    int maxRow = -1;
+    int minColumn = columns;
+    int maxColumn = -1;
+    for (int row = 0; row < rows; row++) {
+      for (int column = 0; column < columns; column++) {
+        if (gridState.isAlive(row, column)) {
+          minRow = Math.min(minRow, row);
+          maxRow = Math.max(maxRow, row);
+          minColumn = Math.min(minColumn, column);
+          maxColumn = Math.max(maxColumn, column);
+        }
+      }
+    }
+    if (maxRow < minRow || maxColumn < minColumn) {
+      showInfo("No hay celdas vivas para centrar.");
+      return;
+    }
+    int patternRows = maxRow - minRow + 1;
+    int patternColumns = maxColumn - minColumn + 1;
+    int targetRow = (rows - patternRows) / 2;
+    int targetColumn = (columns - patternColumns) / 2;
+    boolean[][] centered = new boolean[rows][columns];
+    for (int row = minRow; row <= maxRow; row++) {
+      for (int column = minColumn; column <= maxColumn; column++) {
+        if (gridState.isAlive(row, column)) {
+          centered[targetRow + (row - minRow)][targetColumn + (column - minColumn)] = true;
+        }
+      }
+    }
+    gridState.load(centered);
+    gridView.refresh();
   }
 
   private void savePattern() {
