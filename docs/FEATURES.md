@@ -405,3 +405,24 @@ Como usuario, quiero redimensionar o maximizar la ventana sin perder controles n
 - Rediseño visual completo de estilos.
 - Modo multi-ventana.
 - Configuracion de layouts por usuario.
+
+## TASK-016 — Panel IA: ejecutar busqueda genetica
+Estado: done
+
+## Objetivo
+Agregar un panel de IA en la UI para lanzar la busqueda genetica y mostrar el mejor fitness encontrado.
+
+## Historia de Usuario
+Como usuario, quiero iniciar la busqueda de patrones desde la interfaz y ver el fitness resultante, para evaluar rapidamente si la IA encontro algo interesante.
+
+## Criterios de Aceptacion
+- [x] Existe una seccion "IA" en la UI con un boton "Buscar" o "Run".
+- [x] Al ejecutar, la busqueda genetica corre en background y la UI sigue respondiendo.
+- [x] Al finalizar, se muestra el mejor fitness en la interfaz.
+- [x] La ejecucion no bloquea Play/Pause/Step ni el render de la cuadricula.
+
+## Fuera de Alcance
+- Aplicar el patron a la cuadricula.
+- Cancelacion de la busqueda.
+- Configuracion avanzada de parametros.
+- Visualizacion grafica del progreso.

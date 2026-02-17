@@ -1,5 +1,6 @@
 package com.davidpe.gmolife.ui;
 
+import com.davidpe.gmolife.engine.SimulationEngine;
 import com.davidpe.gmolife.pattern.PatternData;
 import com.davidpe.gmolife.pattern.PatternIO;
 import com.davidpe.gmolife.ui.grid.EditableGridView;
@@ -7,7 +8,9 @@ import com.davidpe.gmolife.ui.grid.GridState;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
@@ -19,6 +22,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.SplitPane;
 import javafx.scene.layout.StackPane;
@@ -28,11 +32,12 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import javafx.geometry.Pos;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 public final class MainWindow {
 
@@ -52,8 +57,14 @@ public final class MainWindow {
   private static final double RANDOM_MAX_PROBABILITY = 0.45;
   private static final int POPULATION_HISTORY = 100;
   private static final List<String> BASIC_PATTERNS = List.of("Glider", "Blinker", "Toad", "Beacon");
+  private static final int AI_POPULATION_SIZE = 40;
+  private static final int AI_GENERATIONS = 24;
+  private static final int AI_EVALUATION_STEPS = 12;
+  private static final double AI_MUTATION_RATE = 0.05;
+  private static final double AI_CROSSOVER_RATE = 0.6;
 
   private final GridState gridState = new GridState(GRID_ROWS, GRID_COLUMNS);
+  private final SimulationEngine simulationEngine = new SimulationEngine();
   private final Random random = new Random();
   private EditableGridView gridView;
   private Timeline timeline;
@@ -70,6 +81,10 @@ public final class MainWindow {
   private StackPane gridContainer;
   private double desiredCellSize = DEFAULT_CELL_SIZE;
   private Label zoomValue;
+  private Button aiRunButton;
+  private Label aiFitnessValue;
+  private Label aiStatusValue;
+  private CompletableFuture<SimulationEngine.GeneticSearchResult> aiSearch;
 
   public void show(Stage stage) {
     this.stage = stage;
@@ -86,6 +101,7 @@ public final class MainWindow {
     stage.setScene(scene);
     stage.setMinWidth(MIN_WINDOW_WIDTH);
     stage.setMinHeight(MIN_WINDOW_HEIGHT);
+    stage.setOnCloseRequest(event -> simulationEngine.shutdown());
     stage.show();
   }
 
@@ -224,10 +240,33 @@ public final class MainWindow {
     populationSeries = new XYChart.Series<>();
     chart.getData().add(populationSeries);
 
-    VBox panel = new VBox(chart);
+    VBox panel = new VBox(chart, buildAiPanel());
     panel.setPadding(new Insets(16));
     panel.setMinWidth(280);
     VBox.setVgrow(chart, Priority.ALWAYS);
+    return panel;
+  }
+
+  private VBox buildAiPanel() {
+    Label title = new Label("IA");
+    title.setStyle("-fx-font-weight: bold;");
+
+    aiRunButton = new Button("Buscar");
+    aiRunButton.setOnAction(event -> runAiSearch());
+
+    Label statusLabel = new Label("Estado:");
+    aiStatusValue = new Label("Listo");
+    HBox statusRow = new HBox(statusLabel, aiStatusValue);
+    statusRow.setSpacing(6);
+
+    Label fitnessLabel = new Label("Fitness:");
+    aiFitnessValue = new Label("-");
+    HBox fitnessRow = new HBox(fitnessLabel, aiFitnessValue);
+    fitnessRow.setSpacing(6);
+
+    VBox panel = new VBox(title, aiRunButton, statusRow, fitnessRow);
+    panel.setSpacing(8);
+    panel.setPadding(new Insets(12, 0, 0, 0));
     return panel;
   }
 
@@ -362,6 +401,50 @@ public final class MainWindow {
   private void applyZoom(double cellSize) {
     desiredCellSize = cellSize;
     updateGridSizing();
+  }
+
+  private void runAiSearch() {
+    if (aiSearch != null && !aiSearch.isDone()) {
+      return;
+    }
+    if (aiRunButton != null) {
+      aiRunButton.setDisable(true);
+    }
+    if (aiStatusValue != null) {
+      aiStatusValue.setText("Buscando...");
+    }
+    SimulationEngine.GeneticSearchConfig config = new SimulationEngine.GeneticSearchConfig(
+        GRID_ROWS,
+        GRID_COLUMNS,
+        AI_POPULATION_SIZE,
+        AI_GENERATIONS,
+        AI_EVALUATION_STEPS,
+        AI_MUTATION_RATE,
+        AI_CROSSOVER_RATE);
+    aiSearch = simulationEngine.findPromisingPattern(config);
+    aiSearch.whenComplete((result, error) -> {
+      Platform.runLater(() -> handleAiSearchCompleted(result, error));
+    });
+  }
+
+  private void handleAiSearchCompleted(SimulationEngine.GeneticSearchResult result, Throwable error) {
+    if (aiRunButton != null) {
+      aiRunButton.setDisable(false);
+    }
+    if (error != null) {
+      Throwable cause = error instanceof CompletionException ? error.getCause() : error;
+      if (aiStatusValue != null) {
+        aiStatusValue.setText("Error");
+      }
+      showError("No se pudo completar la busqueda IA: " + cause.getMessage());
+      return;
+    }
+    if (aiStatusValue != null) {
+      aiStatusValue.setText("Listo");
+    }
+    if (aiFitnessValue != null) {
+      aiFitnessValue.setText(String.format("%.2f", result.fitness()));
+    }
   }
 
   private void updateGridSizing() {
