@@ -954,3 +954,23 @@ Como usuario, quiero ver una lista de atajos en pantalla, para aprender a usar l
 - Buscador de atajos.
 - Atajos configurables desde la UI.
 - Tutorial interactivo.
+
+## TASK-045 — Resaltado de celda en hover
+Estado: done
+
+## Objetivo
+Resaltar la celda bajo el cursor para mejorar precision al editar.
+
+## Historia de Usuario
+Como usuario, quiero ver un resaltado al pasar el mouse sobre una celda, para saber exactamente donde editare.
+
+## Criterios de Aceptacion
+- [x] Al mover el mouse sobre la cuadricula, la celda bajo el cursor se resalta con un borde o color suave.
+- [x] El resaltado desaparece al salir de la cuadricula.
+- [x] El resaltado no altera el estado viva/muerta de la celda.
+- [x] Funciona con zoom y con lineas de cuadricula visibles u ocultas.
+
+## Fuera de Alcance
+- Seleccion multiple o rectangular.
+- Resaltado persistente de celdas vivas.
+- Cambios de tema o estilos avanzados.
