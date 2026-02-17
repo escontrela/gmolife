@@ -117,6 +117,7 @@ public final class MainWindow {
   private StackPane gridContainer;
   private double desiredCellSize = DEFAULT_CELL_SIZE;
   private Label zoomValue;
+  private Label playStateValue;
   private CheckBox toroidalToggle;
   private boolean toroidalEnabled;
   private CheckBox gridLinesToggle;
@@ -195,6 +196,10 @@ public final class MainWindow {
     Button copyPatternButton = new Button("Copiar patron");
     Button pastePatternButton = new Button("Pegar patron");
     pauseButton.setDisable(true);
+    Label playStateLabel = new Label("Simulacion:");
+    playStateValue = new Label("Pause");
+    HBox playStateRow = new HBox(playStateLabel, playStateValue);
+    playStateRow.setSpacing(6);
 
     timeline =
         new Timeline(
@@ -353,6 +358,7 @@ public final class MainWindow {
             pauseButton,
             resetButton,
             randomizeButton,
+            playStateRow,
             saveButton,
             loadButton,
             exportPngButton,
@@ -538,6 +544,7 @@ public final class MainWindow {
       stepButton.setDisable(true);
     }
     resetTps();
+    updatePlayState(true);
   }
 
   private void pausePlay() {
@@ -554,6 +561,7 @@ public final class MainWindow {
       stepButton.setDisable(false);
     }
     resetTps();
+    updatePlayState(false);
   }
 
   private void resetSimulation() {
@@ -579,6 +587,13 @@ public final class MainWindow {
     }
     if (stepButton != null) {
       stepButton.setDisable(false);
+    }
+    updatePlayState(false);
+  }
+
+  private void updatePlayState(boolean playing) {
+    if (playStateValue != null) {
+      playStateValue.setText(playing ? "Play" : "Pause");
     }
   }
 

@@ -782,3 +782,21 @@ Como equipo, quiero tests de GridState y PatternIO, para prevenir regresiones en
 - Tests de UI JavaFX.
 - Benchmarks de rendimiento.
 - Coverage exhaustivo de IA.
+
+## TASK-036 — Indicador de estado Play/Pause
+Estado: done
+
+## Objetivo
+Mostrar claramente si la simulacion esta en Play o Pause.
+
+## Historia de Usuario
+Como usuario, quiero ver el estado actual de la simulacion, para saber si esta corriendo o detenida.
+
+## Criterios de Aceptacion
+- [x] La UI muestra un label o badge con estado "Play" o "Pause".
+- [x] El estado cambia inmediatamente al pulsar Play o Pause.
+- [x] Al iniciar la app, el estado inicial es "Pause".
+
+## Fuera de Alcance
+- Animaciones avanzadas del indicador.
+- Persistencia del estado entre sesiones.
