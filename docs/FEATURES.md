@@ -564,3 +564,23 @@ Como usuario, quiero seleccionar un tamano de tablero predefinido, para adaptar 
 - Ingreso de tamanos personalizados.
 - Persistencia entre sesiones.
 - Reescalado automatico del contenido existente.
+
+## TASK-024 — Modo toroidal (wrap-around)
+Estado: backlog
+
+## Objetivo
+Permitir alternar un modo toroidal para el calculo de vecinos en la simulacion.
+
+## Historia de Usuario
+Como usuario, quiero activar el modo toroidal, para que los bordes se conecten y observar patrones continuos.
+
+## Criterios de Aceptacion
+- [ ] Existe un toggle "Toroidal" en la UI de simulacion.
+- [ ] Cuando esta activo, la simulacion calcula vecinos con wrap-around en los bordes.
+- [ ] El cambio de modo se aplica al siguiente tick sin reiniciar la cuadricula.
+- [ ] El modo por defecto es no toroidal.
+
+## Fuera de Alcance
+- Multiples modos de frontera.
+- Persistencia del modo entre sesiones.
+- Visualizacion especial de bordes.
