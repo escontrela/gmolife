@@ -742,3 +742,23 @@ Como usuario, quiero copiar el patron actual al portapapeles, para compartirlo r
 - Formatos alternativos (RLE, JSON).
 - Copiar solo la seleccion.
 - Historial de copiados.
+
+## TASK-034 — Pegar patron desde portapapeles
+Estado: done
+
+## Objetivo
+Permitir cargar un patron desde el portapapeles usando el formato de PatternIO.
+
+## Historia de Usuario
+Como usuario, quiero pegar un patron desde el portapapeles, para cargar rapidamente patrones compartidos.
+
+## Criterios de Aceptacion
+- [x] Existe un boton "Pegar patron" en la UI.
+- [x] Si el texto es valido, la cuadricula se carga centrada y la generacion vuelve a 0.
+- [x] Si el texto es invalido, se muestra un mensaje de error claro.
+- [x] La poblacion y grafica se recalculan al aplicar el patron.
+
+## Fuera de Alcance
+- Auto-deteccion de formatos alternativos.
+- Persistencia del portapapeles.
+- Historial de pegados.

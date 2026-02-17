@@ -193,6 +193,7 @@ public final class MainWindow {
     Button loadButton = new Button("Load");
     Button exportPngButton = new Button("Exportar PNG");
     Button copyPatternButton = new Button("Copiar patron");
+    Button pastePatternButton = new Button("Pegar patron");
     pauseButton.setDisable(true);
 
     timeline =
@@ -314,6 +315,11 @@ public final class MainWindow {
           copyPatternToClipboard();
         });
 
+    pastePatternButton.setOnAction(
+        event -> {
+          pastePatternFromClipboard();
+        });
+
     Label patternLabel = new Label("Patrones:");
     ComboBox<String> patternPicker = new ComboBox<>();
     patternPicker.getItems().addAll(BASIC_PATTERNS);
@@ -351,6 +357,7 @@ public final class MainWindow {
             loadButton,
             exportPngButton,
             copyPatternButton,
+            pastePatternButton,
             patternLabel,
             patternPicker,
             speedLabel,
@@ -1323,6 +1330,41 @@ public final class MainWindow {
       showInfo("Patron copiado al portapapeles.");
     } catch (IllegalArgumentException ex) {
       showError("No se pudo copiar el patron: " + ex.getMessage());
+    }
+  }
+
+  private void pastePatternFromClipboard() {
+    Clipboard clipboard = Clipboard.getSystemClipboard();
+    if (clipboard == null || !clipboard.hasString()) {
+      showError("El portapapeles no contiene un patron valido.");
+      return;
+    }
+    String content = clipboard.getString();
+    try {
+      PatternData data = PatternIO.parse(content);
+      boolean[][] pattern = data.cells();
+      if (pattern.length > gridState.getRows() || pattern[0].length > gridState.getColumns()) {
+        showError("El patron excede el tamano de la cuadricula.");
+        return;
+      }
+      gridState.clear();
+      int rowOffset = (gridState.getRows() - pattern.length) / 2;
+      int columnOffset = (gridState.getColumns() - pattern[0].length) / 2;
+      for (int row = 0; row < pattern.length; row++) {
+        for (int column = 0; column < pattern[row].length; column++) {
+          if (pattern[row][column]) {
+            gridState.setCell(row + rowOffset, column + columnOffset, true);
+          }
+        }
+      }
+      generation = 0;
+      gridView.refresh();
+      resetPopulationSeries();
+      updateCounters();
+      resetPopulationStats();
+      showInfo("Patron pegado desde el portapapeles.");
+    } catch (IllegalArgumentException ex) {
+      showError("No se pudo pegar el patron: " + ex.getMessage());
     }
   }
 
