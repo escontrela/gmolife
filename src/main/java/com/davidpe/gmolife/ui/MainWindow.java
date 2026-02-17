@@ -6,6 +6,8 @@ import com.davidpe.gmolife.pattern.PatternIO;
 import com.davidpe.gmolife.ui.grid.EditableGridView;
 import com.davidpe.gmolife.ui.grid.GridState;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Random;
@@ -359,7 +361,10 @@ public final class MainWindow {
     chart.getData().add(populationSeries);
     chart.getData().addAll(birthsSeries, deathsSeries);
 
-    VBox panel = new VBox(chart, buildAiPanel());
+    Button exportCsvButton = new Button("Exportar CSV");
+    exportCsvButton.setOnAction(event -> exportPopulationCsv());
+
+    VBox panel = new VBox(chart, exportCsvButton, buildAiPanel());
     panel.setPadding(new Insets(16));
     panel.setMinWidth(280);
     VBox.setVgrow(chart, Priority.ALWAYS);
@@ -1025,6 +1030,43 @@ public final class MainWindow {
       showInfo("Patron cargado desde " + filePath.getFileName() + ".");
     } catch (IOException | IllegalArgumentException ex) {
       showError("No se pudo cargar el patron: " + ex.getMessage());
+    }
+  }
+
+  private void exportPopulationCsv() {
+    if (stage == null) {
+      return;
+    }
+    if (populationSeries == null) {
+      showError("No hay datos de poblacion para exportar.");
+      return;
+    }
+    FileChooser chooser = new FileChooser();
+    chooser.setTitle("Exportar poblacion a CSV");
+    chooser
+        .getExtensionFilters()
+        .addAll(
+            new FileChooser.ExtensionFilter("CSV file (*.csv)", "*.csv"),
+            new FileChooser.ExtensionFilter("All files (*.*)", "*.*"));
+    chooser.setInitialFileName("poblacion.csv");
+    var file = chooser.showSaveDialog(stage);
+    if (file == null) {
+      return;
+    }
+    Path filePath = file.toPath();
+    StringBuilder builder = new StringBuilder("generacion,poblacion\n");
+    for (XYChart.Data<Number, Number> point : populationSeries.getData()) {
+      builder
+          .append(point.getXValue().intValue())
+          .append(',')
+          .append(point.getYValue().intValue())
+          .append('\n');
+    }
+    try {
+      Files.writeString(filePath, builder.toString(), StandardCharsets.UTF_8);
+      showInfo("CSV guardado en " + filePath.getFileName() + ".");
+    } catch (IOException ex) {
+      showError("No se pudo exportar el CSV: " + ex.getMessage());
     }
   }
 

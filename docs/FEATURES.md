@@ -643,3 +643,23 @@ Como usuario, quiero ver los ticks por segundo actuales, para ajustar la velocid
 - Grafica historica de TPS.
 - Calibracion automatica de velocidad.
 - Exportacion de metricas.
+
+## TASK-028 — Exportar grafica de poblacion a CSV
+Estado: done
+
+## Objetivo
+Permitir exportar la serie de poblacion a un archivo CSV.
+
+## Historia de Usuario
+Como usuario, quiero exportar la grafica de poblacion a CSV, para analizarla fuera de la app.
+
+## Criterios de Aceptacion
+- [x] Existe un boton "Exportar CSV" en el panel de grafica.
+- [x] Al pulsarlo, se abre un selector de archivo para guardar.
+- [x] El CSV incluye columnas "generacion" y "poblacion" con los puntos disponibles (max 100).
+- [x] Se muestra confirmacion de guardado exitoso o mensaje de error.
+
+## Fuera de Alcance
+- Exportar otras series (nacimientos/muertes).
+- Formatos adicionales (JSON, PNG).
+- Exportacion automatica.
