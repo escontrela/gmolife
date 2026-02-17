@@ -7,6 +7,7 @@ public final class GridState {
   private final int rows;
   private final int columns;
   private final boolean[][] cells;
+  private boolean toroidal;
 
   public GridState(int rows, int columns) {
     if (rows < 1 || columns < 1) {
@@ -90,6 +91,14 @@ public final class GridState {
     }
   }
 
+  public void setToroidal(boolean toroidal) {
+    this.toroidal = toroidal;
+  }
+
+  public boolean isToroidal() {
+    return toroidal;
+  }
+
   private int countAliveNeighbors(int row, int column) {
     int count = 0;
     for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
@@ -99,11 +108,16 @@ public final class GridState {
         }
         int neighborRow = row + rowOffset;
         int neighborColumn = column + columnOffset;
-        if (neighborRow < 0 || neighborRow >= rows) {
-          continue;
-        }
-        if (neighborColumn < 0 || neighborColumn >= columns) {
-          continue;
+        if (toroidal) {
+          neighborRow = (neighborRow + rows) % rows;
+          neighborColumn = (neighborColumn + columns) % columns;
+        } else {
+          if (neighborRow < 0 || neighborRow >= rows) {
+            continue;
+          }
+          if (neighborColumn < 0 || neighborColumn >= columns) {
+            continue;
+          }
         }
         if (cells[neighborRow][neighborColumn]) {
           count++;

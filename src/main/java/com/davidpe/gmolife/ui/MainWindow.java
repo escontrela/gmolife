@@ -24,6 +24,7 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -93,6 +94,8 @@ public final class MainWindow {
   private StackPane gridContainer;
   private double desiredCellSize = DEFAULT_CELL_SIZE;
   private Label zoomValue;
+  private CheckBox toroidalToggle;
+  private boolean toroidalEnabled;
   private Button aiRunButton;
   private Button aiCancelButton;
   private Button aiApplyButton;
@@ -220,6 +223,14 @@ public final class MainWindow {
           }
         });
 
+    toroidalToggle = new CheckBox("Toroidal");
+    toroidalToggle.setSelected(false);
+    toroidalToggle.setOnAction(
+        event -> {
+          toroidalEnabled = toroidalToggle.isSelected();
+          gridState.setToroidal(toroidalEnabled);
+        });
+
     playButton.setOnAction(
         event -> {
           startPlay();
@@ -291,6 +302,7 @@ public final class MainWindow {
             zoomValue,
             gridSizeLabel,
             gridSizePicker,
+            toroidalToggle,
             generationLabel,
             generationValue,
             populationLabel,
@@ -807,6 +819,7 @@ public final class MainWindow {
     }
     generation = 0;
     gridState = new GridState(size.rows, size.columns);
+    gridState.setToroidal(toroidalEnabled);
     gridView = new EditableGridView(gridState, desiredCellSize);
     gridView.setPadding(new Insets(24));
     if (gridContainer != null) {
