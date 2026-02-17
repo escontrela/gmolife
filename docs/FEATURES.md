@@ -994,3 +994,23 @@ Como usuario nuevo del proyecto, quiero leer un README claro y orientado a uso, 
 
 ## Fuera de Alcance
 - Documentacion tecnica profunda o guia avanzada para contributors.
+
+## TASK-047 — Selector de objetivo de IA
+Estado: done
+
+## Objetivo
+Permitir elegir el objetivo de busqueda de la IA antes de ejecutar el algoritmo.
+
+## Historia de Usuario
+Como usuario, quiero seleccionar que tipo de resultado quiero de la IA, para orientar la busqueda segun mi interes.
+
+## Criterios de Aceptacion
+- [x] La seccion IA incluye un selector de objetivo con al menos: poblacion alta, oscilador y glider.
+- [x] El objetivo seleccionado se usa al iniciar una nueva ejecucion de IA.
+- [x] El objetivo activo se muestra claramente en la UI durante la ejecucion.
+- [x] Si no se cambia manualmente, se usa un objetivo por defecto definido por la app.
+
+## Fuera de Alcance
+- Editor avanzado de funciones de fitness.
+- Objetivos personalizados por el usuario.
+- Entrenamiento multiobjetivo.

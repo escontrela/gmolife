@@ -79,6 +79,8 @@ public final class MainWindow {
   private static final double AI_MUTATION_RATE = 0.05;
   private static final double AI_CROSSOVER_RATE = 0.6;
   private static final double AI_PREVIEW_CELL_SIZE = 6;
+  private static final SimulationEngine.GeneticObjective AI_DEFAULT_OBJECTIVE =
+      SimulationEngine.GeneticObjective.HIGH_POPULATION;
   private static final List<GridSize> GRID_SIZES =
       List.of(
           new GridSize("25x25", 25, 25),
@@ -129,6 +131,7 @@ public final class MainWindow {
   private Label aiFitnessValue;
   private Label aiIterationValue;
   private Label aiStatusValue;
+  private Label aiObjectiveValue;
   private Label statusMessage;
   private Label cursorPositionValue;
   private EditableGridView aiPreviewView;
@@ -136,6 +139,7 @@ public final class MainWindow {
   private TextField aiPopulationField;
   private TextField aiGenerationsField;
   private TextField aiMutationField;
+  private ComboBox<SimulationEngine.GeneticObjective> aiObjectivePicker;
   private CompletableFuture<SimulationEngine.GeneticSearchResult> aiSearch;
   private boolean[][] aiResultPattern;
   private SimulationEngine.CancellationToken aiCancellationToken;
@@ -515,6 +519,14 @@ public final class MainWindow {
     HBox mutationRow = new HBox(mutationLabel, aiMutationField);
     mutationRow.setSpacing(6);
 
+    Label objectiveLabel = new Label("Objetivo:");
+    aiObjectivePicker = new ComboBox<>();
+    aiObjectivePicker.getItems().addAll(SimulationEngine.GeneticObjective.values());
+    aiObjectivePicker.setValue(AI_DEFAULT_OBJECTIVE);
+    aiObjectivePicker.setConverter(new AiObjectiveConverter());
+    HBox objectiveRow = new HBox(objectiveLabel, aiObjectivePicker);
+    objectiveRow.setSpacing(6);
+
     Label iterationLabel = new Label("Iteracion:");
     aiIterationValue = new Label("0");
     HBox iterationRow = new HBox(iterationLabel, aiIterationValue);
@@ -529,6 +541,11 @@ public final class MainWindow {
     aiFitnessValue = new Label("-");
     HBox fitnessRow = new HBox(fitnessLabel, aiFitnessValue);
     fitnessRow.setSpacing(6);
+
+    Label objectiveValueLabel = new Label("Objetivo activo:");
+    aiObjectiveValue = new Label(formatObjective(AI_DEFAULT_OBJECTIVE));
+    HBox objectiveValueRow = new HBox(objectiveValueLabel, aiObjectiveValue);
+    objectiveValueRow.setSpacing(6);
 
     Label previewLabel = new Label("Vista previa:");
     aiPreviewView = new EditableGridView(aiPreviewState, AI_PREVIEW_CELL_SIZE);
@@ -547,9 +564,11 @@ public final class MainWindow {
             populationRow,
             generationsRow,
             mutationRow,
+            objectiveRow,
             iterationRow,
             statusRow,
             fitnessRow,
+            objectiveValueRow,
             previewLabel,
             aiPreviewContainer);
     panel.setSpacing(8);
@@ -921,6 +940,10 @@ public final class MainWindow {
     if (aiFitnessValue != null) {
       aiFitnessValue.setText("-");
     }
+    SimulationEngine.GeneticObjective objective = resolveAiObjective();
+    if (aiObjectiveValue != null) {
+      aiObjectiveValue.setText(formatObjective(objective));
+    }
     aiCancellationToken = new SimulationEngine.CancellationToken();
     int populationSize = resolveAiPopulationSize();
     int generations = resolveAiGenerations();
@@ -933,7 +956,8 @@ public final class MainWindow {
             generations,
             AI_EVALUATION_STEPS,
             mutationRate,
-            AI_CROSSOVER_RATE);
+            AI_CROSSOVER_RATE,
+            objective);
     SimulationEngine.GeneticSearchProgressListener progressListener =
         (iteration, bestFitness) -> {
           Platform.runLater(() -> updateAiProgress(iteration, bestFitness));
@@ -1017,6 +1041,52 @@ public final class MainWindow {
     }
     if (aiFitnessValue != null) {
       aiFitnessValue.setText(String.format("%.2f", bestFitness));
+    }
+  }
+
+  private SimulationEngine.GeneticObjective resolveAiObjective() {
+    if (aiObjectivePicker == null) {
+      return AI_DEFAULT_OBJECTIVE;
+    }
+    SimulationEngine.GeneticObjective selected = aiObjectivePicker.getValue();
+    return selected != null ? selected : AI_DEFAULT_OBJECTIVE;
+  }
+
+  private String formatObjective(SimulationEngine.GeneticObjective objective) {
+    return switch (objective) {
+      case HIGH_POPULATION -> "Poblacion alta";
+      case OSCILLATOR -> "Oscilador";
+      case GLIDER -> "Glider";
+    };
+  }
+
+  private static final class AiObjectiveConverter
+      extends javafx.util.StringConverter<SimulationEngine.GeneticObjective> {
+    @Override
+    public String toString(SimulationEngine.GeneticObjective objective) {
+      if (objective == null) {
+        return "";
+      }
+      return switch (objective) {
+        case HIGH_POPULATION -> "Poblacion alta";
+        case OSCILLATOR -> "Oscilador";
+        case GLIDER -> "Glider";
+      };
+    }
+
+    @Override
+    public SimulationEngine.GeneticObjective fromString(String value) {
+      if (value == null) {
+        return AI_DEFAULT_OBJECTIVE;
+      }
+      String trimmed = value.trim();
+      if (trimmed.equalsIgnoreCase("Oscilador")) {
+        return SimulationEngine.GeneticObjective.OSCILLATOR;
+      }
+      if (trimmed.equalsIgnoreCase("Glider")) {
+        return SimulationEngine.GeneticObjective.GLIDER;
+      }
+      return SimulationEngine.GeneticObjective.HIGH_POPULATION;
     }
   }
 

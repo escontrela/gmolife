@@ -58,7 +58,8 @@ public final class SimulationEngine {
 
     for (int generation = 0; generation < config.generations(); generation++) {
       checkCancelled(token);
-      List<ScoredPattern> scored = scorePopulation(population, config.evaluationSteps(), token);
+      List<ScoredPattern> scored =
+          scorePopulation(population, config.evaluationSteps(), config.objective(), token);
       for (ScoredPattern entry : scored) {
         if (entry.fitness > bestFitness) {
           bestFitness = entry.fitness;
@@ -83,7 +84,7 @@ public final class SimulationEngine {
 
     if (bestPattern == null) {
       bestPattern = randomPattern(config.rows(), config.columns());
-      bestFitness = scorePattern(bestPattern, config.evaluationSteps(), token);
+      bestFitness = scorePattern(bestPattern, config.evaluationSteps(), config.objective(), token);
     }
     return new GeneticSearchResult(bestPattern, bestFitness);
   }
@@ -94,16 +95,32 @@ public final class SimulationEngine {
   }
 
   private List<ScoredPattern> scorePopulation(
-      List<boolean[][]> population, int evaluationSteps, CancellationToken token) {
+      List<boolean[][]> population,
+      int evaluationSteps,
+      GeneticObjective objective,
+      CancellationToken token) {
     List<ScoredPattern> scored = new ArrayList<>(population.size());
     for (boolean[][] pattern : population) {
-      scored.add(new ScoredPattern(pattern, scorePattern(pattern, evaluationSteps, token)));
+      scored.add(new ScoredPattern(pattern, scorePattern(pattern, evaluationSteps, objective, token)));
     }
     scored.sort((a, b) -> Double.compare(b.fitness, a.fitness));
     return scored;
   }
 
-  private double scorePattern(boolean[][] pattern, int evaluationSteps, CancellationToken token) {
+  private double scorePattern(
+      boolean[][] pattern,
+      int evaluationSteps,
+      GeneticObjective objective,
+      CancellationToken token) {
+    return switch (objective) {
+      case HIGH_POPULATION -> scoreHighPopulation(pattern, evaluationSteps, token);
+      case OSCILLATOR -> scoreOscillator(pattern, evaluationSteps, token);
+      case GLIDER -> scoreGlider(pattern, evaluationSteps, token);
+    };
+  }
+
+  private double scoreHighPopulation(
+      boolean[][] pattern, int evaluationSteps, CancellationToken token) {
     boolean[][] current = copyPattern(pattern);
     double total = 0;
     for (int step = 0; step < evaluationSteps; step++) {
@@ -112,6 +129,43 @@ public final class SimulationEngine {
       current = advance(current);
     }
     return total / evaluationSteps;
+  }
+
+  private double scoreOscillator(boolean[][] pattern, int evaluationSteps, CancellationToken token) {
+    boolean[][] current = copyPattern(pattern);
+    List<String> signatures = new ArrayList<>(evaluationSteps);
+    double total = 0;
+    for (int step = 0; step < evaluationSteps; step++) {
+      checkCancelled(token);
+      total += countAlive(current);
+      String signature = signatureFor(current);
+      for (int prev = 0; prev < signatures.size(); prev++) {
+        if (signature.equals(signatures.get(prev))) {
+          int period = (step + 1) - (prev + 1);
+          if (period >= 2) {
+            double average = total / (step + 1);
+            return 800 + average - period * 10;
+          }
+        }
+      }
+      signatures.add(signature);
+      current = advance(current);
+    }
+    return (total / evaluationSteps) * 0.6;
+  }
+
+  private double scoreGlider(boolean[][] pattern, int evaluationSteps, CancellationToken token) {
+    boolean[][] current = copyPattern(pattern);
+    double total = 0;
+    int gliderScore = 0;
+    for (int step = 0; step < evaluationSteps; step++) {
+      checkCancelled(token);
+      total += countAlive(current);
+      gliderScore += countGliders(current) * 100;
+      current = advance(current);
+    }
+    double average = total / evaluationSteps;
+    return gliderScore + average;
   }
 
   private boolean[][] select(List<ScoredPattern> scored) {
@@ -191,6 +245,52 @@ public final class SimulationEngine {
     return next;
   }
 
+  private int countGliders(boolean[][] pattern) {
+    int rows = pattern.length;
+    int columns = pattern[0].length;
+    int count = 0;
+    for (int row = 0; row <= rows - 3; row++) {
+      for (int column = 0; column <= columns - 3; column++) {
+        if (matchesGlider(pattern, row, column)) {
+          count++;
+        }
+      }
+    }
+    return count;
+  }
+
+  private boolean matchesGlider(boolean[][] pattern, int startRow, int startColumn) {
+    boolean[][][] shapes = GLIDER_SHAPES;
+    for (boolean[][] shape : shapes) {
+      boolean match = true;
+      for (int row = 0; row < 3 && match; row++) {
+        for (int column = 0; column < 3; column++) {
+          if (pattern[startRow + row][startColumn + column] != shape[row][column]) {
+            match = false;
+            break;
+          }
+        }
+      }
+      if (match) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private String signatureFor(boolean[][] pattern) {
+    int rows = pattern.length;
+    int columns = pattern[0].length;
+    StringBuilder builder = new StringBuilder(rows * (columns + 1));
+    for (int row = 0; row < rows; row++) {
+      for (int column = 0; column < columns; column++) {
+        builder.append(pattern[row][column] ? '1' : '0');
+      }
+      builder.append('|');
+    }
+    return builder.toString();
+  }
+
   private int countNeighbors(boolean[][] pattern, int row, int column) {
     int rows = pattern.length;
     int columns = pattern[0].length;
@@ -235,6 +335,12 @@ public final class SimulationEngine {
     }
   }
 
+  public enum GeneticObjective {
+    HIGH_POPULATION,
+    OSCILLATOR,
+    GLIDER
+  }
+
   public static final class CancellationToken {
     private final AtomicBoolean cancelled = new AtomicBoolean(false);
 
@@ -264,7 +370,8 @@ public final class SimulationEngine {
       int generations,
       int evaluationSteps,
       double mutationRate,
-      double crossoverRate) {
+      double crossoverRate,
+      GeneticObjective objective) {
 
     public GeneticSearchConfig {
       if (rows < 1 || columns < 1) {
@@ -285,6 +392,9 @@ public final class SimulationEngine {
       if (crossoverRate < 0 || crossoverRate > 1) {
         throw new IllegalArgumentException("Crossover rate must be between 0 and 1.");
       }
+      if (objective == null) {
+        throw new IllegalArgumentException("Objective must be defined.");
+      }
     }
   }
 
@@ -296,6 +406,30 @@ public final class SimulationEngine {
       }
     }
   }
+
+  private static final boolean[][][] GLIDER_SHAPES =
+      new boolean[][][] {
+        new boolean[][] {
+          {false, true, false},
+          {false, false, true},
+          {true, true, true}
+        },
+        new boolean[][] {
+          {true, false, false},
+          {true, false, true},
+          {true, true, false}
+        },
+        new boolean[][] {
+          {true, true, true},
+          {true, false, false},
+          {false, true, false}
+        },
+        new boolean[][] {
+          {false, true, true},
+          {true, false, true},
+          {false, false, true}
+        }
+      };
 
   private static final class DaemonThreadFactory implements ThreadFactory {
     @Override
