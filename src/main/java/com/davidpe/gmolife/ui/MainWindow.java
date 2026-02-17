@@ -82,9 +82,11 @@ public final class MainWindow {
   private double desiredCellSize = DEFAULT_CELL_SIZE;
   private Label zoomValue;
   private Button aiRunButton;
+  private Button aiApplyButton;
   private Label aiFitnessValue;
   private Label aiStatusValue;
   private CompletableFuture<SimulationEngine.GeneticSearchResult> aiSearch;
+  private boolean[][] aiResultPattern;
 
   public void show(Stage stage) {
     this.stage = stage;
@@ -254,6 +256,10 @@ public final class MainWindow {
     aiRunButton = new Button("Buscar");
     aiRunButton.setOnAction(event -> runAiSearch());
 
+    aiApplyButton = new Button("Aplicar IA");
+    aiApplyButton.setDisable(true);
+    aiApplyButton.setOnAction(event -> applyAiPattern());
+
     Label statusLabel = new Label("Estado:");
     aiStatusValue = new Label("Listo");
     HBox statusRow = new HBox(statusLabel, aiStatusValue);
@@ -264,7 +270,7 @@ public final class MainWindow {
     HBox fitnessRow = new HBox(fitnessLabel, aiFitnessValue);
     fitnessRow.setSpacing(6);
 
-    VBox panel = new VBox(title, aiRunButton, statusRow, fitnessRow);
+    VBox panel = new VBox(title, aiRunButton, aiApplyButton, statusRow, fitnessRow);
     panel.setSpacing(8);
     panel.setPadding(new Insets(12, 0, 0, 0));
     return panel;
@@ -410,6 +416,9 @@ public final class MainWindow {
     if (aiRunButton != null) {
       aiRunButton.setDisable(true);
     }
+    if (aiApplyButton != null) {
+      aiApplyButton.setDisable(true);
+    }
     if (aiStatusValue != null) {
       aiStatusValue.setText("Buscando...");
     }
@@ -436,15 +445,30 @@ public final class MainWindow {
       if (aiStatusValue != null) {
         aiStatusValue.setText("Error");
       }
+      if (aiApplyButton != null) {
+        aiApplyButton.setDisable(aiResultPattern == null);
+      }
       showError("No se pudo completar la busqueda IA: " + cause.getMessage());
       return;
     }
     if (aiStatusValue != null) {
       aiStatusValue.setText("Listo");
     }
+    aiResultPattern = result.pattern();
     if (aiFitnessValue != null) {
       aiFitnessValue.setText(String.format("%.2f", result.fitness()));
     }
+    if (aiApplyButton != null) {
+      aiApplyButton.setDisable(aiResultPattern == null);
+    }
+  }
+
+  private void applyAiPattern() {
+    if (aiResultPattern == null) {
+      showError("No hay un resultado de IA disponible para aplicar.");
+      return;
+    }
+    loadPatternCentered(aiResultPattern);
   }
 
   private void updateGridSizing() {
