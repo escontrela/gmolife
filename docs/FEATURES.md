@@ -507,7 +507,7 @@ Como usuario, quiero configurar parametros basicos de la IA, para controlar el e
 - Multiples objetivos de fitness.
 
 ## TASK-021 — Progreso IA en tiempo real
-Estado: backlog
+Estado: done
 
 ## Objetivo
 Mostrar el avance de la busqueda genetica durante la ejecucion.
@@ -516,9 +516,9 @@ Mostrar el avance de la busqueda genetica durante la ejecucion.
 Como usuario, quiero ver el progreso actual de la IA mientras corre, para decidir si espero o cancelo.
 
 ## Criterios de Aceptacion
-- [ ] La seccion de IA muestra la iteracion actual y el mejor fitness parcial durante la ejecucion.
-- [ ] Los valores se actualizan periodicamente sin bloquear la UI.
-- [ ] Al finalizar o cancelar, el estado se actualiza a completado o cancelado.
+- [x] La seccion de IA muestra la iteracion actual y el mejor fitness parcial durante la ejecucion.
+- [x] Los valores se actualizan periodicamente sin bloquear la UI.
+- [x] Al finalizar o cancelar, el estado se actualiza a completado o cancelado.
 
 ## Fuera de Alcance
 - Grafica detallada del progreso.

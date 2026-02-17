@@ -31,15 +31,22 @@ public final class SimulationEngine {
 
   public CompletableFuture<GeneticSearchResult> findPromisingPattern(
       GeneticSearchConfig config, CancellationToken token) {
+    return findPromisingPattern(config, token, null);
+  }
+
+  public CompletableFuture<GeneticSearchResult> findPromisingPattern(
+      GeneticSearchConfig config, CancellationToken token, GeneticSearchProgressListener listener) {
     Objects.requireNonNull(config, "config");
-    return CompletableFuture.supplyAsync(() -> runGeneticSearch(config, token), executor);
+    return CompletableFuture.supplyAsync(
+        () -> runGeneticSearch(config, token, listener), executor);
   }
 
   public void shutdown() {
     executor.shutdownNow();
   }
 
-  private GeneticSearchResult runGeneticSearch(GeneticSearchConfig config, CancellationToken token) {
+  private GeneticSearchResult runGeneticSearch(
+      GeneticSearchConfig config, CancellationToken token, GeneticSearchProgressListener listener) {
     List<boolean[][]> population = new ArrayList<>(config.populationSize());
     for (int i = 0; i < config.populationSize(); i++) {
       checkCancelled(token);
@@ -57,6 +64,9 @@ public final class SimulationEngine {
           bestFitness = entry.fitness;
           bestPattern = copyPattern(entry.pattern);
         }
+      }
+      if (listener != null) {
+        listener.onProgress(generation + 1, bestFitness);
       }
       List<boolean[][]> next = new ArrayList<>(config.populationSize());
       next.add(copyPattern(scored.get(0).pattern));
@@ -76,6 +86,11 @@ public final class SimulationEngine {
       bestFitness = scorePattern(bestPattern, config.evaluationSteps(), token);
     }
     return new GeneticSearchResult(bestPattern, bestFitness);
+  }
+
+  @FunctionalInterface
+  public interface GeneticSearchProgressListener {
+    void onProgress(int generation, double bestFitness);
   }
 
   private List<ScoredPattern> scorePopulation(

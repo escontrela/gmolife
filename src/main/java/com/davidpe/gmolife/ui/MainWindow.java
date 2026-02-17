@@ -89,6 +89,7 @@ public final class MainWindow {
   private Button aiCancelButton;
   private Button aiApplyButton;
   private Label aiFitnessValue;
+  private Label aiIterationValue;
   private Label aiStatusValue;
   private EditableGridView aiPreviewView;
   private TextField aiPopulationField;
@@ -335,6 +336,11 @@ public final class MainWindow {
     HBox mutationRow = new HBox(mutationLabel, aiMutationField);
     mutationRow.setSpacing(6);
 
+    Label iterationLabel = new Label("Iteracion:");
+    aiIterationValue = new Label("0");
+    HBox iterationRow = new HBox(iterationLabel, aiIterationValue);
+    iterationRow.setSpacing(6);
+
     Label statusLabel = new Label("Estado:");
     aiStatusValue = new Label("Listo");
     HBox statusRow = new HBox(statusLabel, aiStatusValue);
@@ -361,6 +367,7 @@ public final class MainWindow {
             populationRow,
             generationsRow,
             mutationRow,
+            iterationRow,
             statusRow,
             fitnessRow,
             previewLabel,
@@ -597,6 +604,12 @@ public final class MainWindow {
     if (aiStatusValue != null) {
       aiStatusValue.setText("Buscando...");
     }
+    if (aiIterationValue != null) {
+      aiIterationValue.setText("0");
+    }
+    if (aiFitnessValue != null) {
+      aiFitnessValue.setText("-");
+    }
     aiCancellationToken = new SimulationEngine.CancellationToken();
     int populationSize = resolveAiPopulationSize();
     int generations = resolveAiGenerations();
@@ -610,7 +623,11 @@ public final class MainWindow {
             AI_EVALUATION_STEPS,
             mutationRate,
             AI_CROSSOVER_RATE);
-    aiSearch = simulationEngine.findPromisingPattern(config, aiCancellationToken);
+    SimulationEngine.GeneticSearchProgressListener progressListener =
+        (iteration, bestFitness) -> {
+          Platform.runLater(() -> updateAiProgress(iteration, bestFitness));
+        };
+    aiSearch = simulationEngine.findPromisingPattern(config, aiCancellationToken, progressListener);
     aiSearch.whenComplete(
         (result, error) -> {
           Platform.runLater(() -> handleAiSearchCompleted(result, error));
@@ -679,6 +696,15 @@ public final class MainWindow {
       return;
     }
     loadPatternCentered(aiResultPattern);
+  }
+
+  private void updateAiProgress(int iteration, double bestFitness) {
+    if (aiIterationValue != null) {
+      aiIterationValue.setText(Integer.toString(iteration));
+    }
+    if (aiFitnessValue != null) {
+      aiFitnessValue.setText(String.format("%.2f", bestFitness));
+    }
   }
 
   private void updateAiPreview(boolean[][] pattern) {
