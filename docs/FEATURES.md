@@ -324,3 +324,23 @@ Como usuario, quiero iniciar la busqueda de patrones desde la interfaz y ver el 
 - Cancelacion de la busqueda.
 - Configuracion avanzada de parametros.
 - Visualizacion grafica del progreso.
+
+## TASK-017 — Aplicar patron IA a la cuadricula
+Estado: backlog
+
+## Objetivo
+Permitir aplicar el mejor patron encontrado por la IA directamente a la cuadricula actual.
+
+## Historia de Usuario
+Como usuario, quiero aplicar el resultado de la IA con un clic, para probar el patron sugerido sin copiarlo manualmente.
+
+## Criterios de Aceptacion
+- [ ] Existe un boton "Aplicar IA" visible en la seccion de IA.
+- [ ] El boton solo se habilita cuando existe un resultado valido de IA.
+- [ ] Al aplicar, la cuadricula se carga centrada con el patron de IA y la generacion vuelve a 0.
+- [ ] La poblacion y grafica se actualizan acorde al nuevo estado.
+
+## Fuera de Alcance
+- Guardar automaticamente el patron a archivo.
+- Comparacion visual entre patron actual y el de IA.
+- Edicion avanzada del patron sugerido.
