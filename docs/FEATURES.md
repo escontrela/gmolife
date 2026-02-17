@@ -663,3 +663,23 @@ Como usuario, quiero exportar la grafica de poblacion a CSV, para analizarla fue
 - Exportar otras series (nacimientos/muertes).
 - Formatos adicionales (JSON, PNG).
 - Exportacion automatica.
+
+## TASK-029 — Estadisticas de poblacion (min/max/promedio)
+Estado: done
+
+## Objetivo
+Mostrar estadisticas basicas de poblacion durante la simulacion.
+
+## Historia de Usuario
+Como usuario, quiero ver min/max/promedio de poblacion, para entender mejor la evolucion del patron.
+
+## Criterios de Aceptacion
+- [x] La UI muestra tres labels: min, max y promedio de poblacion.
+- [x] Los valores se recalculan al usar Step y durante Play.
+- [x] Al pulsar Reset, las estadisticas vuelven a 0.
+- [x] El calculo no bloquea la UI.
+
+## Fuera de Alcance
+- Estadisticas por ventana de tiempo.
+- Exportar estadisticas.
+- Comparativas entre ejecuciones.

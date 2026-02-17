@@ -88,6 +88,13 @@ public final class MainWindow {
   private Label tpsValue;
   private long tpsWindowStartNanos;
   private int tpsTickCount;
+  private Label minPopulationValue;
+  private Label maxPopulationValue;
+  private Label avgPopulationValue;
+  private int minPopulation;
+  private int maxPopulation;
+  private long totalPopulation;
+  private int populationSamples;
   private XYChart.Series<Number, Number> populationSeries;
   private XYChart.Series<Number, Number> birthsSeries;
   private XYChart.Series<Number, Number> deathsSeries;
@@ -300,6 +307,12 @@ public final class MainWindow {
     generationValue = new Label("0");
     Label populationLabel = new Label("Poblacion:");
     populationValue = new Label("0");
+    Label minPopulationLabel = new Label("Min:");
+    minPopulationValue = new Label("0");
+    Label maxPopulationLabel = new Label("Max:");
+    maxPopulationValue = new Label("0");
+    Label avgPopulationLabel = new Label("Promedio:");
+    avgPopulationValue = new Label("0");
     Label tpsLabel = new Label("TPS:");
     tpsValue = new Label("0");
     updateCounters();
@@ -329,6 +342,12 @@ public final class MainWindow {
             generationValue,
             populationLabel,
             populationValue,
+            minPopulationLabel,
+            minPopulationValue,
+            maxPopulationLabel,
+            maxPopulationValue,
+            avgPopulationLabel,
+            avgPopulationValue,
             tpsLabel,
             tpsValue);
     controls.setPadding(new Insets(16));
@@ -463,6 +482,7 @@ public final class MainWindow {
     gridView.refresh();
     updateCounters();
     updateBirthDeathSeries(before);
+    updatePopulationStats(gridState.countAliveCells());
     updateTps(timeline != null && timeline.getStatus() == Animation.Status.RUNNING);
   }
 
@@ -514,6 +534,7 @@ public final class MainWindow {
     resetPopulationSeries();
     updateCounters();
     clearAiPreview();
+    resetPopulationStats();
     resetTps();
     if (playButton != null) {
       playButton.setDisable(false);
@@ -562,6 +583,41 @@ public final class MainWindow {
       int alive = gridState.countAliveCells();
       populationValue.setText(Integer.toString(alive));
       updatePopulationSeries(generation, alive);
+    }
+  }
+
+  private void updatePopulationStats(int alive) {
+    if (minPopulationValue == null || maxPopulationValue == null || avgPopulationValue == null) {
+      return;
+    }
+    if (populationSamples == 0) {
+      minPopulation = alive;
+      maxPopulation = alive;
+    } else {
+      minPopulation = Math.min(minPopulation, alive);
+      maxPopulation = Math.max(maxPopulation, alive);
+    }
+    totalPopulation += alive;
+    populationSamples++;
+    double average = totalPopulation / (double) populationSamples;
+    minPopulationValue.setText(Integer.toString(minPopulation));
+    maxPopulationValue.setText(Integer.toString(maxPopulation));
+    avgPopulationValue.setText(String.format("%.1f", average));
+  }
+
+  private void resetPopulationStats() {
+    minPopulation = 0;
+    maxPopulation = 0;
+    totalPopulation = 0L;
+    populationSamples = 0;
+    if (minPopulationValue != null) {
+      minPopulationValue.setText("0");
+    }
+    if (maxPopulationValue != null) {
+      maxPopulationValue.setText("0");
+    }
+    if (avgPopulationValue != null) {
+      avgPopulationValue.setText("0");
     }
   }
 
@@ -913,6 +969,7 @@ public final class MainWindow {
     updateGridSizing();
     resetPopulationSeries();
     updateCounters();
+    resetPopulationStats();
     resetAiStateForGrid();
     if (playButton != null) {
       playButton.setDisable(false);
@@ -972,6 +1029,7 @@ public final class MainWindow {
     generation = 0;
     gridView.refresh();
     updateCounters();
+    resetPopulationStats();
   }
 
   private void savePattern() {
@@ -1027,6 +1085,7 @@ public final class MainWindow {
       gridView.refresh();
       resetPopulationSeries();
       updateCounters();
+      resetPopulationStats();
       showInfo("Patron cargado desde " + filePath.getFileName() + ".");
     } catch (IOException | IllegalArgumentException ex) {
       showError("No se pudo cargar el patron: " + ex.getMessage());
