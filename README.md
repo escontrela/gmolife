@@ -1,47 +1,59 @@
 # Game of Life
 
-Game of Life es una aplicacion visual para explorar el famoso juego de la vida de Conway. Permite crear, editar y simular patrones de celulas, observar su evolucion y usar una IA integrada para descubrir configuraciones interesantes sin escribir codigo.
+Game of Life is a visual application to explore Conway’s famous Game of Life. It lets you create, edit, and simulate cell patterns, observe their evolution, and use a built‑in AI search to discover interesting configurations without writing code.
 
-## Que puedes hacer
-- Simular patrones con controles de Play, Pause y Step para avanzar a tu ritmo.
-- Ajustar la velocidad y el zoom para ver el detalle que necesitas.
-- Cambiar el tamano del tablero y habilitar el modo toroidal.
-- Dibujar y editar celulas directamente en la cuadricula.
-- Cargar patrones basicos como Glider o Blinker.
-- Guardar y cargar patrones propios, copiar y pegar desde el portapapeles.
-- Centrar el patron actual en el tablero.
-- Exportar una imagen PNG del tablero.
-- Ver contadores de generacion, poblacion, min/max/promedio y TPS.
-- Consultar una grafica de poblacion con exportacion a CSV.
-- Ejecutar la IA para buscar un patron prometedor, ver su fitness y vista previa.
-- Cancelar una busqueda de IA en curso y aplicar el mejor patron encontrado con un clic.
+## What you can do
+- Simulate patterns with Play, Pause, and Step controls at your own pace.
+- Adjust speed and zoom to see the detail you need.
+- Change the board size and enable toroidal mode.
+- Draw and edit cells directly on the grid.
+- Load basic patterns like Glider or Blinker.
+- Save and load your own patterns, copy/paste from the clipboard.
+- Center the current pattern on the board.
+- Export a PNG image of the board.
+- Track generation, population, min/max/average, and TPS counters.
+- View a population chart and export it to CSV.
+- Run the AI search to find a promising pattern, see its fitness and preview.
+- Cancel a running AI search and apply the best pattern with one click.
 
-## Controles principales
-- Play: inicia la simulacion automatica.
-- Pause: detiene la simulacion.
-- Step: avanza una generacion.
-- Reset: limpia el tablero y reinicia contadores.
-- Randomize: genera un tablero inicial aleatorio.
-- Centrar: reubica el patron en el centro del tablero.
-- Velocidad: ajusta el tiempo entre generaciones.
-- Zoom: cambia el tamano de las celdas.
-- Guardar/Cargar: guarda patrones en archivo y los recupera despues.
-- Copiar/Pegar: lleva el patron al portapapeles o lo importa desde alli.
-- Exportar PNG: genera una imagen del tablero actual.
-- Exportar CSV: descarga la serie de poblacion mostrada en la grafica.
-- IA: define parametros (poblacion, generaciones, mutacion) y ejecuta la busqueda.
-- Aplicar IA: carga el patron sugerido por la IA en el tablero.
+## Main controls
+- Play: starts the automatic simulation.
+- Pause: stops the simulation.
+- Step: advances one generation.
+- Reset: clears the board and resets counters.
+- Randomize: generates a random starting board.
+- Center: repositions the pattern to the board center.
+- Speed: adjusts the time between generations.
+- Zoom: changes cell size.
+- Save/Load: saves patterns to a file and restores them later.
+- Copy/Paste: sends the pattern to the clipboard or imports it from there.
+- Export PNG: generates an image of the current board.
+- Export CSV: downloads the population series shown in the chart.
+- AI: sets parameters (population, generations, mutation) and runs the search.
+- Apply AI: loads the AI‑suggested pattern into the board.
 
-## Guia rapida de uso (5-8 pasos)
-1. Elige un tamano de tablero y ajusta el zoom si lo necesitas.
-2. Dibuja algunas celulas o selecciona un patron basico.
-3. Pulsa Play para ver la evolucion, o Step para avanzar manualmente.
-4. Ajusta la velocidad mientras corre la simulacion.
-5. Si encuentras un estado interesante, usa Guardar o Exportar PNG.
-6. Si quieres explorar automaticamente, abre la seccion IA y presiona Buscar.
-7. Revisa el fitness y la vista previa del resultado de IA.
-8. Si te gusta el patron, pulsa Aplicar IA y continua la simulacion.
+## Quick start (5–8 steps)
+1. Choose a board size and adjust zoom if needed.
+2. Draw some cells or select a basic pattern.
+3. Press Play to see the evolution, or Step to advance manually.
+4. Adjust speed while the simulation is running.
+5. If you find an interesting state, use Save or Export PNG.
+6. For automatic exploration, open the AI section and press Search.
+7. Review the fitness and preview of the AI result.
+8. If you like the pattern, press Apply AI and continue the simulation.
 
-## Notas
-- La aplicacion esta pensada para exploracion visual; no requiere conocimientos tecnicos.
-- La funcion de IA busca patrones que mantengan una poblacion interesante segun su fitness.
+## Technical architecture
+The UI is built with JavaFX and keeps rendering concerns separate from the simulation state. The grid view renders `GridState`, while higher‑level orchestration (play/pause, counters, exports, AI panel) lives in the main window controller.
+
+`SimulationEngine` is the technical core for the AI search feature. It runs a genetic algorithm on a background single‑thread executor to avoid blocking the JavaFX UI thread. The engine:
+- Generates a population of boolean grids and evaluates them over multiple steps.
+- Scores candidates with configurable objectives (e.g., high population, oscillators, glider density).
+- Evolves patterns via selection, crossover, and mutation.
+- Supports cancellation through a `CancellationToken` and surfaces progress via a listener callback.
+- Returns the best‑scoring pattern as an immutable result object.
+
+This separation keeps the UI responsive while the search iterates, and makes the AI logic reusable and testable outside the JavaFX layer.
+
+## Notes
+- The application is designed for visual exploration and does not require technical knowledge.
+- The AI search looks for patterns that keep an interesting population according to its fitness function.
