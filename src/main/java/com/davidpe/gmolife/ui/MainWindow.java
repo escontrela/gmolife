@@ -63,8 +63,10 @@ public final class MainWindow {
   private static final int AI_EVALUATION_STEPS = 12;
   private static final double AI_MUTATION_RATE = 0.05;
   private static final double AI_CROSSOVER_RATE = 0.6;
+  private static final double AI_PREVIEW_CELL_SIZE = 6;
 
   private final GridState gridState = new GridState(GRID_ROWS, GRID_COLUMNS);
+  private final GridState aiPreviewState = new GridState(GRID_ROWS, GRID_COLUMNS);
   private final SimulationEngine simulationEngine = new SimulationEngine();
   private final Random random = new Random();
   private EditableGridView gridView;
@@ -87,6 +89,7 @@ public final class MainWindow {
   private Button aiApplyButton;
   private Label aiFitnessValue;
   private Label aiStatusValue;
+  private EditableGridView aiPreviewView;
   private CompletableFuture<SimulationEngine.GeneticSearchResult> aiSearch;
   private boolean[][] aiResultPattern;
   private SimulationEngine.CancellationToken aiCancellationToken;
@@ -277,7 +280,14 @@ public final class MainWindow {
     HBox fitnessRow = new HBox(fitnessLabel, aiFitnessValue);
     fitnessRow.setSpacing(6);
 
-    VBox panel = new VBox(title, aiRunButton, aiCancelButton, aiApplyButton, statusRow, fitnessRow);
+    Label previewLabel = new Label("Vista previa:");
+    aiPreviewView = new EditableGridView(aiPreviewState, AI_PREVIEW_CELL_SIZE);
+    aiPreviewView.setMouseTransparent(true);
+    StackPane previewContainer = new StackPane(aiPreviewView);
+    previewContainer.setPadding(new Insets(8));
+    previewContainer.setPrefSize(220, 220);
+
+    VBox panel = new VBox(title, aiRunButton, aiCancelButton, aiApplyButton, statusRow, fitnessRow, previewLabel, previewContainer);
     panel.setSpacing(8);
     panel.setPadding(new Insets(12, 0, 0, 0));
     return panel;
@@ -335,6 +345,7 @@ public final class MainWindow {
     gridView.refresh();
     resetPopulationSeries();
     updateCounters();
+    clearAiPreview();
     if (playButton != null) {
       playButton.setDisable(false);
     }
@@ -499,6 +510,7 @@ public final class MainWindow {
     if (aiApplyButton != null) {
       aiApplyButton.setDisable(aiResultPattern == null);
     }
+    updateAiPreview(aiResultPattern);
   }
 
   private void applyAiPattern() {
@@ -507,6 +519,22 @@ public final class MainWindow {
       return;
     }
     loadPatternCentered(aiResultPattern);
+  }
+
+  private void updateAiPreview(boolean[][] pattern) {
+    if (aiPreviewView == null || pattern == null) {
+      return;
+    }
+    aiPreviewState.load(pattern);
+    aiPreviewView.refresh();
+  }
+
+  private void clearAiPreview() {
+    if (aiPreviewView == null) {
+      return;
+    }
+    aiPreviewState.clear();
+    aiPreviewView.refresh();
   }
 
   private void updateGridSizing() {
