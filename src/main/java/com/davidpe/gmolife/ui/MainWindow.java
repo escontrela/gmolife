@@ -28,6 +28,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
@@ -90,6 +91,9 @@ public final class MainWindow {
   private Label aiFitnessValue;
   private Label aiStatusValue;
   private EditableGridView aiPreviewView;
+  private TextField aiPopulationField;
+  private TextField aiGenerationsField;
+  private TextField aiMutationField;
   private CompletableFuture<SimulationEngine.GeneticSearchResult> aiSearch;
   private boolean[][] aiResultPattern;
   private SimulationEngine.CancellationToken aiCancellationToken;
@@ -313,6 +317,24 @@ public final class MainWindow {
     aiApplyButton.setDisable(true);
     aiApplyButton.setOnAction(event -> applyAiPattern());
 
+    Label populationLabel = new Label("Poblacion:");
+    aiPopulationField = new TextField(Integer.toString(AI_POPULATION_SIZE));
+    aiPopulationField.setPrefColumnCount(6);
+    HBox populationRow = new HBox(populationLabel, aiPopulationField);
+    populationRow.setSpacing(6);
+
+    Label generationsLabel = new Label("Generaciones:");
+    aiGenerationsField = new TextField(Integer.toString(AI_GENERATIONS));
+    aiGenerationsField.setPrefColumnCount(6);
+    HBox generationsRow = new HBox(generationsLabel, aiGenerationsField);
+    generationsRow.setSpacing(6);
+
+    Label mutationLabel = new Label("Mutacion (0-1):");
+    aiMutationField = new TextField(String.format("%.2f", AI_MUTATION_RATE));
+    aiMutationField.setPrefColumnCount(6);
+    HBox mutationRow = new HBox(mutationLabel, aiMutationField);
+    mutationRow.setSpacing(6);
+
     Label statusLabel = new Label("Estado:");
     aiStatusValue = new Label("Listo");
     HBox statusRow = new HBox(statusLabel, aiStatusValue);
@@ -336,6 +358,9 @@ public final class MainWindow {
             aiRunButton,
             aiCancelButton,
             aiApplyButton,
+            populationRow,
+            generationsRow,
+            mutationRow,
             statusRow,
             fitnessRow,
             previewLabel,
@@ -480,6 +505,82 @@ public final class MainWindow {
     updateGridSizing();
   }
 
+  private int resolveAiPopulationSize() {
+    return parsePositiveIntField(aiPopulationField, "poblacion", AI_POPULATION_SIZE);
+  }
+
+  private int resolveAiGenerations() {
+    return parsePositiveIntField(aiGenerationsField, "generaciones", AI_GENERATIONS);
+  }
+
+  private double resolveAiMutationRate() {
+    return parseRateField(aiMutationField, "tasa de mutacion", AI_MUTATION_RATE, 0.0, 1.0);
+  }
+
+  private int parsePositiveIntField(TextField field, String label, int fallback) {
+    if (field == null) {
+      return fallback;
+    }
+    String raw = field.getText();
+    if (raw == null || raw.isBlank()) {
+      field.setText(Integer.toString(fallback));
+      return fallback;
+    }
+    try {
+      int value = Integer.parseInt(raw.trim());
+      if (value < 1) {
+        showError(
+            "El valor de "
+                + label
+                + " debe ser al menos 1. Se usara "
+                + fallback
+                + ".");
+        field.setText(Integer.toString(fallback));
+        return fallback;
+      }
+      return value;
+    } catch (NumberFormatException ex) {
+      showError("El valor de " + label + " no es valido. Se usara " + fallback + ".");
+      field.setText(Integer.toString(fallback));
+      return fallback;
+    }
+  }
+
+  private double parseRateField(
+      TextField field, String label, double fallback, double min, double max) {
+    if (field == null) {
+      return fallback;
+    }
+    String raw = field.getText();
+    if (raw == null || raw.isBlank()) {
+      field.setText(String.format("%.2f", fallback));
+      return fallback;
+    }
+    try {
+      double value = Double.parseDouble(raw.trim());
+      if (value < min || value > max) {
+        double clamped = Math.max(min, Math.min(max, value));
+        showError(
+            "El valor de "
+                + label
+                + " debe estar entre "
+                + min
+                + " y "
+                + max
+                + ". Se ajusto a "
+                + String.format("%.2f", clamped)
+                + ".");
+        field.setText(String.format("%.2f", clamped));
+        return clamped;
+      }
+      return value;
+    } catch (NumberFormatException ex) {
+      showError("El valor de " + label + " no es valido. Se usara " + fallback + ".");
+      field.setText(String.format("%.2f", fallback));
+      return fallback;
+    }
+  }
+
   private void runAiSearch() {
     if (aiSearch != null && !aiSearch.isDone()) {
       return;
@@ -497,14 +598,17 @@ public final class MainWindow {
       aiStatusValue.setText("Buscando...");
     }
     aiCancellationToken = new SimulationEngine.CancellationToken();
+    int populationSize = resolveAiPopulationSize();
+    int generations = resolveAiGenerations();
+    double mutationRate = resolveAiMutationRate();
     SimulationEngine.GeneticSearchConfig config =
         new SimulationEngine.GeneticSearchConfig(
             GRID_ROWS,
             GRID_COLUMNS,
-            AI_POPULATION_SIZE,
-            AI_GENERATIONS,
+            populationSize,
+            generations,
             AI_EVALUATION_STEPS,
-            AI_MUTATION_RATE,
+            mutationRate,
             AI_CROSSOVER_RATE);
     aiSearch = simulationEngine.findPromisingPattern(config, aiCancellationToken);
     aiSearch.whenComplete(

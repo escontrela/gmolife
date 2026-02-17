@@ -488,7 +488,7 @@ Como usuario, quiero ver una vista previa del patron sugerido sin aplicarlo, par
 - Exportar la vista previa como imagen.
 
 ## TASK-020 — Parametros basicos de IA configurables
-Estado: backlog
+Estado: done
 
 ## Objetivo
 Permitir ajustar parametros basicos de la busqueda genetica desde la UI.
@@ -497,9 +497,9 @@ Permitir ajustar parametros basicos de la busqueda genetica desde la UI.
 Como usuario, quiero configurar parametros basicos de la IA, para controlar el esfuerzo de busqueda segun mi necesidad.
 
 ## Criterios de Aceptacion
-- [ ] La seccion de IA incluye campos para poblacion, generaciones y tasa de mutacion con valores por defecto.
-- [ ] Al ejecutar la IA, la busqueda usa los valores configurados por el usuario.
-- [ ] Los valores invalidos se corrigen o muestran error claro sin romper la UI.
+- [x] La seccion de IA incluye campos para poblacion, generaciones y tasa de mutacion con valores por defecto.
+- [x] Al ejecutar la IA, la busqueda usa los valores configurados por el usuario.
+- [x] Los valores invalidos se corrigen o muestran error claro sin romper la UI.
 
 ## Fuera de Alcance
 - Presets avanzados o guardado persistente de configuracion.
