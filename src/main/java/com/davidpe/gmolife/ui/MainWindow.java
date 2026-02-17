@@ -43,8 +43,8 @@ import javafx.util.Duration;
 
 public final class MainWindow {
 
-  private static final int GRID_ROWS = 25;
-  private static final int GRID_COLUMNS = 25;
+  private static final int DEFAULT_GRID_ROWS = 25;
+  private static final int DEFAULT_GRID_COLUMNS = 25;
   private static final double DEFAULT_CELL_SIZE = 24;
   private static final double MIN_CELL_SIZE = 12;
   private static final double MAX_CELL_SIZE = 40;
@@ -65,9 +65,15 @@ public final class MainWindow {
   private static final double AI_MUTATION_RATE = 0.05;
   private static final double AI_CROSSOVER_RATE = 0.6;
   private static final double AI_PREVIEW_CELL_SIZE = 6;
+  private static final List<GridSize> GRID_SIZES =
+      List.of(
+          new GridSize("25x25", 25, 25),
+          new GridSize("50x30", 30, 50),
+          new GridSize("100x60", 60, 100),
+          new GridSize("150x90", 90, 150));
 
-  private final GridState gridState = new GridState(GRID_ROWS, GRID_COLUMNS);
-  private final GridState aiPreviewState = new GridState(GRID_ROWS, GRID_COLUMNS);
+  private GridState gridState = new GridState(DEFAULT_GRID_ROWS, DEFAULT_GRID_COLUMNS);
+  private GridState aiPreviewState = new GridState(DEFAULT_GRID_ROWS, DEFAULT_GRID_COLUMNS);
   private final SimulationEngine simulationEngine = new SimulationEngine();
   private final Random random = new Random();
   private EditableGridView gridView;
@@ -94,6 +100,7 @@ public final class MainWindow {
   private Label aiIterationValue;
   private Label aiStatusValue;
   private EditableGridView aiPreviewView;
+  private StackPane aiPreviewContainer;
   private TextField aiPopulationField;
   private TextField aiGenerationsField;
   private TextField aiMutationField;
@@ -201,6 +208,18 @@ public final class MainWindow {
               applyZoom(newValue.doubleValue());
             });
 
+    Label gridSizeLabel = new Label("Tamano:");
+    ComboBox<GridSize> gridSizePicker = new ComboBox<>();
+    gridSizePicker.getItems().addAll(GRID_SIZES);
+    gridSizePicker.setValue(GRID_SIZES.get(0));
+    gridSizePicker.setOnAction(
+        event -> {
+          GridSize size = gridSizePicker.getValue();
+          if (size != null) {
+            applyGridSize(size);
+          }
+        });
+
     playButton.setOnAction(
         event -> {
           startPlay();
@@ -270,6 +289,8 @@ public final class MainWindow {
             zoomLabel,
             zoomSlider,
             zoomValue,
+            gridSizeLabel,
+            gridSizePicker,
             generationLabel,
             generationValue,
             populationLabel,
@@ -362,9 +383,9 @@ public final class MainWindow {
     Label previewLabel = new Label("Vista previa:");
     aiPreviewView = new EditableGridView(aiPreviewState, AI_PREVIEW_CELL_SIZE);
     aiPreviewView.setMouseTransparent(true);
-    StackPane previewContainer = new StackPane(aiPreviewView);
-    previewContainer.setPadding(new Insets(8));
-    previewContainer.setPrefSize(220, 220);
+    aiPreviewContainer = new StackPane(aiPreviewView);
+    aiPreviewContainer.setPadding(new Insets(8));
+    aiPreviewContainer.setPrefSize(220, 220);
 
     VBox panel =
         new VBox(
@@ -379,7 +400,7 @@ public final class MainWindow {
             statusRow,
             fitnessRow,
             previewLabel,
-            previewContainer);
+            aiPreviewContainer);
     panel.setSpacing(8);
     panel.setPadding(new Insets(12, 0, 0, 0));
     return panel;
@@ -632,8 +653,8 @@ public final class MainWindow {
     double mutationRate = resolveAiMutationRate();
     SimulationEngine.GeneticSearchConfig config =
         new SimulationEngine.GeneticSearchConfig(
-            GRID_ROWS,
-            GRID_COLUMNS,
+            gridState.getRows(),
+            gridState.getColumns(),
             populationSize,
             generations,
             AI_EVALUATION_STEPS,
@@ -761,13 +782,70 @@ public final class MainWindow {
     if (availableWidth <= 0 || availableHeight <= 0) {
       return;
     }
-    double fitByWidth = availableWidth / GRID_COLUMNS;
-    double fitByHeight = availableHeight / GRID_ROWS;
+    double fitByWidth = availableWidth / gridState.getColumns();
+    double fitByHeight = availableHeight / gridState.getRows();
     double fitCellSize = Math.min(fitByWidth, fitByHeight);
     double clamped = Math.max(MIN_CELL_SIZE, Math.min(desiredCellSize, fitCellSize));
     gridView.setCellSize(clamped);
     if (zoomValue != null) {
       zoomValue.setText(String.format("%.0f px", clamped));
+    }
+  }
+
+  private void applyGridSize(GridSize size) {
+    if (size == null) {
+      return;
+    }
+    if (gridState.getRows() == size.rows && gridState.getColumns() == size.columns) {
+      return;
+    }
+    if (aiSearch != null && !aiSearch.isDone()) {
+      cancelAiSearch();
+    }
+    if (timeline != null) {
+      timeline.stop();
+    }
+    generation = 0;
+    gridState = new GridState(size.rows, size.columns);
+    gridView = new EditableGridView(gridState, desiredCellSize);
+    gridView.setPadding(new Insets(24));
+    if (gridContainer != null) {
+      gridContainer.getChildren().setAll(gridView);
+    }
+    updateGridSizing();
+    resetPopulationSeries();
+    updateCounters();
+    resetAiStateForGrid();
+    if (playButton != null) {
+      playButton.setDisable(false);
+    }
+    if (pauseButton != null) {
+      pauseButton.setDisable(true);
+    }
+    if (stepButton != null) {
+      stepButton.setDisable(false);
+    }
+  }
+
+  private void resetAiStateForGrid() {
+    aiResultPattern = null;
+    if (aiApplyButton != null) {
+      aiApplyButton.setDisable(true);
+    }
+    if (aiStatusValue != null) {
+      aiStatusValue.setText("Listo");
+    }
+    if (aiFitnessValue != null) {
+      aiFitnessValue.setText("-");
+    }
+    if (aiIterationValue != null) {
+      aiIterationValue.setText("0");
+    }
+    aiPreviewState = new GridState(gridState.getRows(), gridState.getColumns());
+    aiPreviewView = new EditableGridView(aiPreviewState, AI_PREVIEW_CELL_SIZE);
+    aiPreviewView.setMouseTransparent(true);
+    if (aiPreviewContainer != null) {
+      aiPreviewContainer.getChildren().setAll(aiPreviewView);
     }
   }
 
@@ -842,7 +920,7 @@ public final class MainWindow {
     Path filePath = file.toPath();
     try {
       PatternData data = PatternIO.read(filePath);
-      if (data.rows() != GRID_ROWS || data.columns() != GRID_COLUMNS) {
+      if (data.rows() != gridState.getRows() || data.columns() != gridState.getColumns()) {
         showError("El patron no coincide con el tamano de la cuadricula.");
         return;
       }
@@ -887,13 +965,15 @@ public final class MainWindow {
       showError("El patron seleccionado es invalido.");
       return;
     }
-    if (pattern.length > GRID_ROWS || pattern[0].length > GRID_COLUMNS) {
+    int rows = gridState.getRows();
+    int columns = gridState.getColumns();
+    if (pattern.length > rows || pattern[0].length > columns) {
       showError("El patron excede el tamano de la cuadricula.");
       return;
     }
     gridState.clear();
-    int rowOffset = (GRID_ROWS - pattern.length) / 2;
-    int columnOffset = (GRID_COLUMNS - pattern[0].length) / 2;
+    int rowOffset = (rows - pattern.length) / 2;
+    int columnOffset = (columns - pattern[0].length) / 2;
     for (int row = 0; row < pattern.length; row++) {
       for (int column = 0; column < pattern[row].length; column++) {
         if (pattern[row][column]) {
@@ -974,9 +1054,11 @@ public final class MainWindow {
   }
 
   private boolean[][] buildRandomPattern(double probability) {
-    boolean[][] pattern = new boolean[GRID_ROWS][GRID_COLUMNS];
-    for (int row = 0; row < GRID_ROWS; row++) {
-      for (int column = 0; column < GRID_COLUMNS; column++) {
+    int rows = gridState.getRows();
+    int columns = gridState.getColumns();
+    boolean[][] pattern = new boolean[rows][columns];
+    for (int row = 0; row < rows; row++) {
+      for (int column = 0; column < columns; column++) {
         pattern[row][column] = random.nextDouble() < probability;
       }
     }
@@ -985,9 +1067,9 @@ public final class MainWindow {
 
   private boolean isTrivial(boolean[][] pattern) {
     int alive = 0;
-    int total = GRID_ROWS * GRID_COLUMNS;
-    for (int row = 0; row < GRID_ROWS; row++) {
-      for (int column = 0; column < GRID_COLUMNS; column++) {
+    int total = gridState.getRows() * gridState.getColumns();
+    for (int row = 0; row < gridState.getRows(); row++) {
+      for (int column = 0; column < gridState.getColumns(); column++) {
         if (pattern[row][column]) {
           alive++;
         }
@@ -997,18 +1079,35 @@ public final class MainWindow {
   }
 
   private boolean evolvesWithinSteps(boolean[][] pattern, int steps) {
-    GridState simulation = new GridState(GRID_ROWS, GRID_COLUMNS);
+    GridState simulation = new GridState(gridState.getRows(), gridState.getColumns());
     simulation.load(pattern);
     for (int step = 0; step < steps; step++) {
       simulation.advance();
     }
-    for (int row = 0; row < GRID_ROWS; row++) {
-      for (int column = 0; column < GRID_COLUMNS; column++) {
+    for (int row = 0; row < gridState.getRows(); row++) {
+      for (int column = 0; column < gridState.getColumns(); column++) {
         if (simulation.isAlive(row, column) != pattern[row][column]) {
           return true;
         }
       }
     }
     return false;
+  }
+
+  private static final class GridSize {
+    private final String label;
+    private final int rows;
+    private final int columns;
+
+    private GridSize(String label, int rows, int columns) {
+      this.label = label;
+      this.rows = rows;
+      this.columns = columns;
+    }
+
+    @Override
+    public String toString() {
+      return label;
+    }
   }
 }

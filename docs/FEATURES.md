@@ -546,7 +546,7 @@ Como usuario, quiero ver nacimientos y muertes por generacion, para entender mej
 - Anotaciones en la grafica.
 
 ## TASK-023 — Selector de tamano de cuadricula
-Estado: backlog
+Estado: done
 
 ## Objetivo
 Permitir elegir el tamano de la cuadricula desde la UI.
@@ -555,10 +555,10 @@ Permitir elegir el tamano de la cuadricula desde la UI.
 Como usuario, quiero seleccionar un tamano de tablero predefinido, para adaptar el espacio de simulacion a mi pantalla.
 
 ## Criterios de Aceptacion
-- [ ] Existe un selector con tamanos predefinidos (por ejemplo 50x30, 100x60, 150x90).
-- [ ] Al cambiar el tamano, la cuadricula se reinicia vacia y los contadores vuelven a 0.
-- [ ] La grafica se reinicia al aplicar un nuevo tamano.
-- [ ] El tamano seleccionado se mantiene durante la sesion.
+- [x] Existe un selector con tamanos predefinidos (por ejemplo 50x30, 100x60, 150x90).
+- [x] Al cambiar el tamano, la cuadricula se reinicia vacia y los contadores vuelven a 0.
+- [x] La grafica se reinicia al aplicar un nuevo tamano.
+- [x] El tamano seleccionado se mantiene durante la sesion.
 
 ## Fuera de Alcance
 - Ingreso de tamanos personalizados.
