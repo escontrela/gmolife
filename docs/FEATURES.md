@@ -856,3 +856,21 @@ Como usuario, quiero ver confirmaciones y errores en una barra de estado, para e
 - Historial de mensajes.
 - Notificaciones del sistema.
 - Persistencia del ultimo mensaje.
+
+## TASK-039 — Atajos de teclado para Save/Load
+Estado: done
+
+## Objetivo
+Permitir usar atajos de teclado para guardar y cargar patrones.
+
+## Historia de Usuario
+Como usuario, quiero usar atajos de teclado para Save y Load, para trabajar mas rapido.
+
+## Criterios de Aceptacion
+- [x] Ctrl/Cmd+S ejecuta Save cuando la ventana principal tiene foco.
+- [x] Ctrl/Cmd+O ejecuta Load cuando la ventana principal tiene foco.
+- [x] Los atajos no rompen el uso de menus o botones existentes.
+
+## Fuera de Alcance
+- Atajos configurables.
+- Atajos para exportar PNG o CSV.

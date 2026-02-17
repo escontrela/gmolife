@@ -648,6 +648,12 @@ public final class MainWindow {
           } else if (event.getCode() == KeyCode.R) {
             resetSimulation();
             event.consume();
+          } else if (event.getCode() == KeyCode.S && event.isShortcutDown()) {
+            savePattern();
+            event.consume();
+          } else if (event.getCode() == KeyCode.O && event.isShortcutDown()) {
+            loadPattern();
+            event.consume();
           }
         });
   }
