@@ -894,3 +894,23 @@ Como usuario, quiero ver las coordenadas de la celda bajo el mouse, para ubicar 
 - Copiar coordenadas al portapapeles.
 - Ir a una coordenada especifica.
 - Mostrar coordenadas absolutas del canvas.
+
+## TASK-042 — Confirmacion al salir con tablero no vacio
+Estado: done
+
+## Objetivo
+Evitar perdida de trabajo al cerrar la app con celdas vivas.
+
+## Historia de Usuario
+Como usuario, quiero confirmar la salida si tengo un patron en pantalla, para no perderlo por error.
+
+## Criterios de Aceptacion
+- [x] Si hay al menos una celda viva, al cerrar la ventana se muestra un dialogo de confirmacion.
+- [x] Si el usuario confirma, la app se cierra normalmente.
+- [x] Si el usuario cancela, la app permanece abierta sin cambios.
+- [x] Si el tablero esta vacio, la app se cierra sin dialogo.
+
+## Fuera de Alcance
+- Guardado automatico al salir.
+- Preferencias persistentes de confirmacion.
+- Confirmaciones para otras acciones (Load, Reset).

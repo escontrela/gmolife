@@ -156,7 +156,14 @@ public final class MainWindow {
     stage.setScene(scene);
     stage.setMinWidth(MIN_WINDOW_WIDTH);
     stage.setMinHeight(MIN_WINDOW_HEIGHT);
-    stage.setOnCloseRequest(event -> simulationEngine.shutdown());
+    stage.setOnCloseRequest(
+        event -> {
+          if (!confirmExitIfNeeded()) {
+            event.consume();
+            return;
+          }
+          simulationEngine.shutdown();
+        });
     stage.show();
   }
 
@@ -1206,6 +1213,21 @@ public final class MainWindow {
     alert.setHeaderText("Confirmar carga");
     alert.setContentText("Hay celdas vivas en el tablero. ¿Deseas cargar otro patron?");
     ButtonType confirm = new ButtonType("Cargar");
+    ButtonType cancel = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
+    alert.getButtonTypes().setAll(confirm, cancel);
+    Optional<ButtonType> result = alert.showAndWait();
+    return result.isPresent() && result.get() == confirm;
+  }
+
+  private boolean confirmExitIfNeeded() {
+    if (gridState.countAliveCells() == 0) {
+      return true;
+    }
+    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    alert.setTitle("Game of Life");
+    alert.setHeaderText("Confirmar salida");
+    alert.setContentText("Hay celdas vivas en el tablero. ¿Deseas salir?");
+    ButtonType confirm = new ButtonType("Salir");
     ButtonType cancel = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
     alert.getButtonTypes().setAll(confirm, cancel);
     Optional<ButtonType> result = alert.showAndWait();
