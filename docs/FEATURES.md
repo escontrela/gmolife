@@ -505,3 +505,22 @@ Como usuario, quiero configurar parametros basicos de la IA, para controlar el e
 - Presets avanzados o guardado persistente de configuracion.
 - Edicion de parametros avanzados (elitismo, cruce, etc.).
 - Multiples objetivos de fitness.
+
+## TASK-021 — Progreso IA en tiempo real
+Estado: backlog
+
+## Objetivo
+Mostrar el avance de la busqueda genetica durante la ejecucion.
+
+## Historia de Usuario
+Como usuario, quiero ver el progreso actual de la IA mientras corre, para decidir si espero o cancelo.
+
+## Criterios de Aceptacion
+- [ ] La seccion de IA muestra la iteracion actual y el mejor fitness parcial durante la ejecucion.
+- [ ] Los valores se actualizan periodicamente sin bloquear la UI.
+- [ ] Al finalizar o cancelar, el estado se actualiza a completado o cancelado.
+
+## Fuera de Alcance
+- Grafica detallada del progreso.
+- Exportar historico de fitness.
+- Notificaciones del sistema.
