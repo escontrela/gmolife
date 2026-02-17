@@ -364,3 +364,23 @@ Como usuario, quiero cancelar la ejecucion de IA cuando tarda demasiado, para re
 - Reintentar automaticamente tras cancelacion.
 - Guardar resultados parciales.
 - Cancelacion de otras tareas de la app.
+
+## TASK-019 — Vista previa del patron IA
+Estado: backlog
+
+## Objetivo
+Mostrar una vista previa en miniatura del mejor patron encontrado por la IA.
+
+## Historia de Usuario
+Como usuario, quiero ver una vista previa del patron sugerido sin aplicarlo, para decidir si me interesa probarlo.
+
+## Criterios de Aceptacion
+- [ ] La seccion de IA incluye una mini-cuadricula o canvas de vista previa.
+- [ ] La vista previa se actualiza al finalizar una ejecucion de IA exitosa.
+- [ ] Si se ejecuta Reset, la vista previa se limpia.
+- [ ] La vista previa no bloquea la interaccion con la cuadricula principal.
+
+## Fuera de Alcance
+- Zoom o pan dentro de la vista previa.
+- Comparacion lado a lado con el patron actual.
+- Exportar la vista previa como imagen.
