@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class SimulationEngine {
 
@@ -24,16 +26,23 @@ public final class SimulationEngine {
 
   public CompletableFuture<GeneticSearchResult> findPromisingPattern(GeneticSearchConfig config) {
     Objects.requireNonNull(config, "config");
-    return CompletableFuture.supplyAsync(() -> runGeneticSearch(config), executor);
+    return findPromisingPattern(config, null);
+  }
+
+  public CompletableFuture<GeneticSearchResult> findPromisingPattern(
+      GeneticSearchConfig config, CancellationToken token) {
+    Objects.requireNonNull(config, "config");
+    return CompletableFuture.supplyAsync(() -> runGeneticSearch(config, token), executor);
   }
 
   public void shutdown() {
     executor.shutdownNow();
   }
 
-  private GeneticSearchResult runGeneticSearch(GeneticSearchConfig config) {
+  private GeneticSearchResult runGeneticSearch(GeneticSearchConfig config, CancellationToken token) {
     List<boolean[][]> population = new ArrayList<>(config.populationSize());
     for (int i = 0; i < config.populationSize(); i++) {
+      checkCancelled(token);
       population.add(randomPattern(config.rows(), config.columns()));
     }
 
@@ -41,7 +50,8 @@ public final class SimulationEngine {
     double bestFitness = Double.NEGATIVE_INFINITY;
 
     for (int generation = 0; generation < config.generations(); generation++) {
-      List<ScoredPattern> scored = scorePopulation(population, config.evaluationSteps());
+      checkCancelled(token);
+      List<ScoredPattern> scored = scorePopulation(population, config.evaluationSteps(), token);
       for (ScoredPattern entry : scored) {
         if (entry.fitness > bestFitness) {
           bestFitness = entry.fitness;
@@ -51,6 +61,7 @@ public final class SimulationEngine {
       List<boolean[][]> next = new ArrayList<>(config.populationSize());
       next.add(copyPattern(scored.get(0).pattern));
       while (next.size() < config.populationSize()) {
+        checkCancelled(token);
         boolean[][] parentA = select(scored);
         boolean[][] parentB = select(scored);
         boolean[][] child = crossover(parentA, parentB, config.crossoverRate());
@@ -62,24 +73,26 @@ public final class SimulationEngine {
 
     if (bestPattern == null) {
       bestPattern = randomPattern(config.rows(), config.columns());
-      bestFitness = scorePattern(bestPattern, config.evaluationSteps());
+      bestFitness = scorePattern(bestPattern, config.evaluationSteps(), token);
     }
     return new GeneticSearchResult(bestPattern, bestFitness);
   }
 
-  private List<ScoredPattern> scorePopulation(List<boolean[][]> population, int evaluationSteps) {
+  private List<ScoredPattern> scorePopulation(
+      List<boolean[][]> population, int evaluationSteps, CancellationToken token) {
     List<ScoredPattern> scored = new ArrayList<>(population.size());
     for (boolean[][] pattern : population) {
-      scored.add(new ScoredPattern(pattern, scorePattern(pattern, evaluationSteps)));
+      scored.add(new ScoredPattern(pattern, scorePattern(pattern, evaluationSteps, token)));
     }
     scored.sort((a, b) -> Double.compare(b.fitness, a.fitness));
     return scored;
   }
 
-  private double scorePattern(boolean[][] pattern, int evaluationSteps) {
+  private double scorePattern(boolean[][] pattern, int evaluationSteps, CancellationToken token) {
     boolean[][] current = copyPattern(pattern);
     double total = 0;
     for (int step = 0; step < evaluationSteps; step++) {
+      checkCancelled(token);
       total += countAlive(current);
       current = advance(current);
     }
@@ -196,6 +209,27 @@ public final class SimulationEngine {
       System.arraycopy(pattern[row], 0, copy[row], 0, columns);
     }
     return copy;
+  }
+
+  private void checkCancelled(CancellationToken token) {
+    if (Thread.currentThread().isInterrupted()) {
+      throw new CancellationException("Genetic search interrupted.");
+    }
+    if (token != null && token.isCancelled()) {
+      throw new CancellationException("Genetic search cancelled.");
+    }
+  }
+
+  public static final class CancellationToken {
+    private final AtomicBoolean cancelled = new AtomicBoolean(false);
+
+    public void cancel() {
+      cancelled.set(true);
+    }
+
+    public boolean isCancelled() {
+      return cancelled.get();
+    }
   }
 
   private static final class ScoredPattern {

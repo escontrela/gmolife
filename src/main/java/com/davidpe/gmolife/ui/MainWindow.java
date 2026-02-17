@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
@@ -82,11 +83,13 @@ public final class MainWindow {
   private double desiredCellSize = DEFAULT_CELL_SIZE;
   private Label zoomValue;
   private Button aiRunButton;
+  private Button aiCancelButton;
   private Button aiApplyButton;
   private Label aiFitnessValue;
   private Label aiStatusValue;
   private CompletableFuture<SimulationEngine.GeneticSearchResult> aiSearch;
   private boolean[][] aiResultPattern;
+  private SimulationEngine.CancellationToken aiCancellationToken;
 
   public void show(Stage stage) {
     this.stage = stage;
@@ -256,6 +259,10 @@ public final class MainWindow {
     aiRunButton = new Button("Buscar");
     aiRunButton.setOnAction(event -> runAiSearch());
 
+    aiCancelButton = new Button("Cancelar IA");
+    aiCancelButton.setDisable(true);
+    aiCancelButton.setOnAction(event -> cancelAiSearch());
+
     aiApplyButton = new Button("Aplicar IA");
     aiApplyButton.setDisable(true);
     aiApplyButton.setOnAction(event -> applyAiPattern());
@@ -270,7 +277,7 @@ public final class MainWindow {
     HBox fitnessRow = new HBox(fitnessLabel, aiFitnessValue);
     fitnessRow.setSpacing(6);
 
-    VBox panel = new VBox(title, aiRunButton, aiApplyButton, statusRow, fitnessRow);
+    VBox panel = new VBox(title, aiRunButton, aiCancelButton, aiApplyButton, statusRow, fitnessRow);
     panel.setSpacing(8);
     panel.setPadding(new Insets(12, 0, 0, 0));
     return panel;
@@ -416,12 +423,16 @@ public final class MainWindow {
     if (aiRunButton != null) {
       aiRunButton.setDisable(true);
     }
+    if (aiCancelButton != null) {
+      aiCancelButton.setDisable(false);
+    }
     if (aiApplyButton != null) {
       aiApplyButton.setDisable(true);
     }
     if (aiStatusValue != null) {
       aiStatusValue.setText("Buscando...");
     }
+    aiCancellationToken = new SimulationEngine.CancellationToken();
     SimulationEngine.GeneticSearchConfig config = new SimulationEngine.GeneticSearchConfig(
         GRID_ROWS,
         GRID_COLUMNS,
@@ -430,18 +441,45 @@ public final class MainWindow {
         AI_EVALUATION_STEPS,
         AI_MUTATION_RATE,
         AI_CROSSOVER_RATE);
-    aiSearch = simulationEngine.findPromisingPattern(config);
+    aiSearch = simulationEngine.findPromisingPattern(config, aiCancellationToken);
     aiSearch.whenComplete((result, error) -> {
       Platform.runLater(() -> handleAiSearchCompleted(result, error));
     });
+  }
+
+  private void cancelAiSearch() {
+    if (aiCancellationToken != null) {
+      aiCancellationToken.cancel();
+    }
+    if (aiSearch != null) {
+      aiSearch.cancel(true);
+    }
+    if (aiCancelButton != null) {
+      aiCancelButton.setDisable(true);
+    }
+    if (aiStatusValue != null) {
+      aiStatusValue.setText("Cancelando...");
+    }
   }
 
   private void handleAiSearchCompleted(SimulationEngine.GeneticSearchResult result, Throwable error) {
     if (aiRunButton != null) {
       aiRunButton.setDisable(false);
     }
+    if (aiCancelButton != null) {
+      aiCancelButton.setDisable(true);
+    }
     if (error != null) {
       Throwable cause = error instanceof CompletionException ? error.getCause() : error;
+      if (cause instanceof CancellationException) {
+        if (aiStatusValue != null) {
+          aiStatusValue.setText("Cancelado");
+        }
+        if (aiApplyButton != null) {
+          aiApplyButton.setDisable(aiResultPattern == null);
+        }
+        return;
+      }
       if (aiStatusValue != null) {
         aiStatusValue.setText("Error");
       }

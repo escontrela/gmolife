@@ -446,3 +446,23 @@ Como usuario, quiero aplicar el resultado de la IA con un clic, para probar el p
 - Guardar automaticamente el patron a archivo.
 - Comparacion visual entre patron actual y el de IA.
 - Edicion avanzada del patron sugerido.
+
+## TASK-018 — Cancelar busqueda IA en curso
+Estado: done
+
+## Objetivo
+Permitir cancelar una busqueda genetica en progreso desde la UI.
+
+## Historia de Usuario
+Como usuario, quiero cancelar la ejecucion de IA cuando tarda demasiado, para retomar el control sin cerrar la app.
+
+## Criterios de Aceptacion
+- [x] Existe un boton "Cancelar IA" visible durante una ejecucion activa.
+- [x] Al cancelar, el proceso de busqueda se detiene sin bloquear la UI.
+- [x] La interfaz refleja el estado "cancelado" y permite volver a ejecutar.
+- [x] No se actualiza el resultado final si la ejecucion fue cancelada.
+
+## Fuera de Alcance
+- Reintentar automaticamente tras cancelacion.
+- Guardar resultados parciales.
+- Cancelacion de otras tareas de la app.
