@@ -623,3 +623,23 @@ Como usuario, quiero poder ocultar las lineas de la cuadricula, para ver el patr
 - Persistencia entre sesiones.
 - Cambios de estilo avanzados.
 - Temas o skins.
+
+## TASK-027 — Indicador de ticks por segundo
+Estado: done
+
+## Objetivo
+Mostrar la velocidad real de simulacion en ticks por segundo.
+
+## Historia de Usuario
+Como usuario, quiero ver los ticks por segundo actuales, para ajustar la velocidad de forma informada.
+
+## Criterios de Aceptacion
+- [x] La UI muestra un label "TPS" con el valor actual.
+- [x] Durante Play, el valor se actualiza al menos 1 vez por segundo.
+- [x] En Pause, el valor muestra 0 o "--".
+- [x] El calculo no bloquea la UI ni degrada el render.
+
+## Fuera de Alcance
+- Grafica historica de TPS.
+- Calibracion automatica de velocidad.
+- Exportacion de metricas.

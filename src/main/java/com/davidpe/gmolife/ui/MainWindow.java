@@ -83,6 +83,9 @@ public final class MainWindow {
   private Label generationValue;
   private Label populationValue;
   private Label speedValue;
+  private Label tpsValue;
+  private long tpsWindowStartNanos;
+  private int tpsTickCount;
   private XYChart.Series<Number, Number> populationSeries;
   private XYChart.Series<Number, Number> birthsSeries;
   private XYChart.Series<Number, Number> deathsSeries;
@@ -295,6 +298,8 @@ public final class MainWindow {
     generationValue = new Label("0");
     Label populationLabel = new Label("Poblacion:");
     populationValue = new Label("0");
+    Label tpsLabel = new Label("TPS:");
+    tpsValue = new Label("0");
     updateCounters();
 
     FlowPane controls =
@@ -321,7 +326,9 @@ public final class MainWindow {
             generationLabel,
             generationValue,
             populationLabel,
-            populationValue);
+            populationValue,
+            tpsLabel,
+            tpsValue);
     controls.setPadding(new Insets(16));
     controls.setHgap(12);
     controls.setVgap(8);
@@ -451,6 +458,7 @@ public final class MainWindow {
     gridView.refresh();
     updateCounters();
     updateBirthDeathSeries(before);
+    updateTps(timeline != null && timeline.getStatus() == Animation.Status.RUNNING);
   }
 
   private void handleStep() {
@@ -472,6 +480,7 @@ public final class MainWindow {
     if (stepButton != null) {
       stepButton.setDisable(true);
     }
+    resetTps();
   }
 
   private void pausePlay() {
@@ -487,6 +496,7 @@ public final class MainWindow {
     if (stepButton != null) {
       stepButton.setDisable(false);
     }
+    resetTps();
   }
 
   private void resetSimulation() {
@@ -499,6 +509,7 @@ public final class MainWindow {
     resetPopulationSeries();
     updateCounters();
     clearAiPreview();
+    resetTps();
     if (playButton != null) {
       playButton.setDisable(false);
     }
@@ -546,6 +557,37 @@ public final class MainWindow {
       int alive = gridState.countAliveCells();
       populationValue.setText(Integer.toString(alive));
       updatePopulationSeries(generation, alive);
+    }
+  }
+
+  private void updateTps(boolean running) {
+    if (tpsValue == null) {
+      return;
+    }
+    if (!running) {
+      tpsValue.setText("0");
+      return;
+    }
+    long now = System.nanoTime();
+    if (tpsWindowStartNanos == 0L) {
+      tpsWindowStartNanos = now;
+    }
+    tpsTickCount++;
+    long elapsedNanos = now - tpsWindowStartNanos;
+    if (elapsedNanos >= 1_000_000_000L) {
+      double elapsedSeconds = elapsedNanos / 1_000_000_000.0;
+      int tps = (int) Math.round(tpsTickCount / elapsedSeconds);
+      tpsValue.setText(Integer.toString(tps));
+      tpsWindowStartNanos = now;
+      tpsTickCount = 0;
+    }
+  }
+
+  private void resetTps() {
+    tpsWindowStartNanos = 0L;
+    tpsTickCount = 0;
+    if (tpsValue != null) {
+      tpsValue.setText("0");
     }
   }
 
