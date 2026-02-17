@@ -2,6 +2,7 @@ package com.davidpe.gmolife.ui.grid;
 
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
+import java.util.function.BiConsumer;
 
 public final class EditableGridView extends GridPane {
 
@@ -15,11 +16,14 @@ public final class EditableGridView extends GridPane {
   private boolean gridLinesVisible = true;
   private Region[][] cellViews;
   private Runnable onEdit;
+  private BiConsumer<Integer, Integer> onHover;
+  private Runnable onHoverExit;
 
   public EditableGridView(GridState gridState, double cellSize) {
     this.gridState = gridState;
     this.cellSize = cellSize;
     buildCells();
+    setOnMouseExited(event -> notifyHoverExit());
   }
 
   private void buildCells() {
@@ -37,6 +41,7 @@ public final class EditableGridView extends GridPane {
     Region cell = new Region();
     applyCellSize(cell);
     updateCellStyle(cell, gridState.isAlive(row, column));
+    cell.setOnMouseEntered(event -> notifyHover(row, column));
     cell.setOnMousePressed(
         event -> {
           gridState.toggle(row, column);
@@ -49,6 +54,7 @@ public final class EditableGridView extends GridPane {
           gridState.toggle(row, column);
           updateCellStyle(cell, gridState.isAlive(row, column));
           notifyEdit();
+          notifyHover(row, column);
         });
     return cell;
   }
@@ -74,9 +80,29 @@ public final class EditableGridView extends GridPane {
     this.onEdit = onEdit;
   }
 
+  public void setOnHover(BiConsumer<Integer, Integer> onHover) {
+    this.onHover = onHover;
+  }
+
+  public void setOnHoverExit(Runnable onHoverExit) {
+    this.onHoverExit = onHoverExit;
+  }
+
   private void notifyEdit() {
     if (onEdit != null) {
       onEdit.run();
+    }
+  }
+
+  private void notifyHover(int row, int column) {
+    if (onHover != null) {
+      onHover.accept(row, column);
+    }
+  }
+
+  private void notifyHoverExit() {
+    if (onHoverExit != null) {
+      onHoverExit.run();
     }
   }
 

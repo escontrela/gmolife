@@ -874,3 +874,23 @@ Como usuario, quiero usar atajos de teclado para Save y Load, para trabajar mas 
 ## Fuera de Alcance
 - Atajos configurables.
 - Atajos para exportar PNG o CSV.
+
+## TASK-041 — Coordenadas del cursor en la cuadricula
+Estado: done
+
+## Objetivo
+Mostrar la fila y columna de la celda bajo el cursor en tiempo real.
+
+## Historia de Usuario
+Como usuario, quiero ver las coordenadas de la celda bajo el mouse, para ubicar patrones con precision.
+
+## Criterios de Aceptacion
+- [x] La UI muestra un label con coordenadas (fila, columna).
+- [x] Al mover el mouse sobre la cuadricula, las coordenadas se actualizan en tiempo real.
+- [x] Al salir de la cuadricula, el label muestra "N/A".
+- [x] El calculo respeta zoom y desplazamiento actuales.
+
+## Fuera de Alcance
+- Copiar coordenadas al portapapeles.
+- Ir a una coordenada especifica.
+- Mostrar coordenadas absolutas del canvas.

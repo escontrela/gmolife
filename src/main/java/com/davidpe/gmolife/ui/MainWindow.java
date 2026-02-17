@@ -130,6 +130,7 @@ public final class MainWindow {
   private Label aiIterationValue;
   private Label aiStatusValue;
   private Label statusMessage;
+  private Label cursorPositionValue;
   private EditableGridView aiPreviewView;
   private StackPane aiPreviewContainer;
   private TextField aiPopulationField;
@@ -161,9 +162,7 @@ public final class MainWindow {
 
   private StackPane buildGrid() {
     gridView = new EditableGridView(gridState, DEFAULT_CELL_SIZE);
-    gridView.setOnEdit(this::pauseIfEditingDuringPlay);
-    gridView.setPadding(new Insets(24));
-    gridView.setGridLinesVisible(gridLinesVisible);
+    configureGridView(gridView);
 
     gridContainer = new StackPane(gridView);
     gridContainer.setPadding(new Insets(16));
@@ -181,6 +180,14 @@ public final class MainWindow {
             });
     updateGridSizing();
     return gridContainer;
+  }
+
+  private void configureGridView(EditableGridView view) {
+    view.setOnEdit(this::pauseIfEditingDuringPlay);
+    view.setPadding(new Insets(24));
+    view.setGridLinesVisible(gridLinesVisible);
+    view.setOnHover(this::updateCursorPosition);
+    view.setOnHoverExit(this::clearCursorPosition);
   }
 
   private FlowPane buildControls() {
@@ -434,7 +441,9 @@ public final class MainWindow {
   private HBox buildStatusBar() {
     Label statusLabel = new Label("Estado:");
     statusMessage = new Label("Listo");
-    HBox statusBar = new HBox(statusLabel, statusMessage);
+    Label cursorLabel = new Label("Cursor:");
+    cursorPositionValue = new Label("N/A");
+    HBox statusBar = new HBox(statusLabel, statusMessage, cursorLabel, cursorPositionValue);
     statusBar.setSpacing(8);
     statusBar.setPadding(new Insets(8, 16, 8, 16));
     statusBar.setAlignment(Pos.CENTER_LEFT);
@@ -1055,9 +1064,7 @@ public final class MainWindow {
     gridState = new GridState(size.rows, size.columns);
     gridState.setToroidal(toroidalEnabled);
     gridView = new EditableGridView(gridState, desiredCellSize);
-    gridView.setOnEdit(this::pauseIfEditingDuringPlay);
-    gridView.setPadding(new Insets(24));
-    gridView.setGridLinesVisible(gridLinesVisible);
+    configureGridView(gridView);
     if (gridContainer != null) {
       gridContainer.getChildren().setAll(gridView);
     }
@@ -1358,6 +1365,20 @@ public final class MainWindow {
     }
     statusMessage.setText(message);
     statusMessage.setStyle(error ? "-fx-text-fill: #b00020;" : "-fx-text-fill: #1b5e20;");
+  }
+
+  private void updateCursorPosition(int row, int column) {
+    if (cursorPositionValue == null) {
+      return;
+    }
+    cursorPositionValue.setText("Fila " + (row + 1) + ", Col " + (column + 1));
+  }
+
+  private void clearCursorPosition() {
+    if (cursorPositionValue == null) {
+      return;
+    }
+    cursorPositionValue.setText("N/A");
   }
 
   private void exportGridPng() {
