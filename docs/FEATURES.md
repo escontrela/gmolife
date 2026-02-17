@@ -1074,3 +1074,23 @@ Como usuario, quiero que la app aplique automaticamente resultados suficientemen
 - Reglas complejas de auto-aplicacion por objetivo.
 - Aplicaciones encadenadas de multiples resultados.
 - Persistencia de configuracion entre sesiones.
+
+## TASK-051 — Destacar botones Play y Pause
+Estado: done
+
+## Objetivo
+Resaltar visualmente los botones Play y Pause con un color diferenciado respecto al resto de botones de accion.
+
+## Historia de Usuario
+Como usuario, quiero identificar rapidamente Play y Pause, para controlar la simulacion sin confundirlos con otras acciones.
+
+## Criterios de Aceptacion
+- [x] Los botones Play y Pause usan un color distinto al resto de botones principales.
+- [x] El nuevo estilo mantiene contraste legible del texto y accesibilidad basica.
+- [x] El cambio visual aplica tanto en estado normal como hover/focus.
+- [x] No se modifica el comportamiento funcional de Play/Pause.
+
+## Fuera de Alcance
+- Rediseno completo del tema de la aplicacion.
+- Cambios en shortcuts o logica del temporizador.
+- Nuevas animaciones de botones.

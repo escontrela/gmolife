@@ -233,6 +233,8 @@ public final class MainWindow {
     Button copyPatternButton = new Button("Copiar patron");
     Button pastePatternButton = new Button("Pegar patron");
     pauseButton.setDisable(true);
+    applyPlayPauseStyles(playButton, "#2e7d32", "#388e3c", "#1b5e20");
+    applyPlayPauseStyles(pauseButton, "#c62828", "#d32f2f", "#b71c1c");
     Label playStateLabel = new Label("Simulacion:");
     playStateValue = new Label("Pause");
     HBox playStateRow = new HBox(playStateLabel, playStateValue);
@@ -709,6 +711,31 @@ public final class MainWindow {
     if (playStateValue != null) {
       playStateValue.setText(playing ? "Play" : "Pause");
     }
+  }
+
+  private void applyPlayPauseStyles(
+      Button button, String normalColor, String hoverColor, String focusBorderColor) {
+    Runnable updater =
+        () -> {
+          boolean hovered = button.isHover();
+          boolean focused = button.isFocused();
+          String background = hovered ? hoverColor : normalColor;
+          StringBuilder style = new StringBuilder();
+          style.append("-fx-background-color: ").append(background).append("; ");
+          style.append("-fx-text-fill: white; ");
+          style.append("-fx-background-radius: 6; ");
+          style.append("-fx-border-radius: 6; ");
+          style.append("-fx-border-width: 2; ");
+          if (focused) {
+            style.append("-fx-border-color: ").append(focusBorderColor).append("; ");
+          } else {
+            style.append("-fx-border-color: transparent; ");
+          }
+          button.setStyle(style.toString());
+        };
+    button.hoverProperty().addListener((obs, oldValue, newValue) -> updater.run());
+    button.focusedProperty().addListener((obs, oldValue, newValue) -> updater.run());
+    updater.run();
   }
 
   private boolean confirmResetIfNeeded() {
