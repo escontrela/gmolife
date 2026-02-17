@@ -603,3 +603,23 @@ Como usuario, quiero un indicador visual de IA en curso, para saber que la busqu
 - Barra de progreso detallada.
 - Notificaciones del sistema.
 - Multiples ejecuciones concurrentes.
+
+## TASK-026 — Toggle de lineas de cuadricula
+Estado: done
+
+## Objetivo
+Permitir mostrar u ocultar las lineas de la cuadricula para mejorar la visualizacion.
+
+## Historia de Usuario
+Como usuario, quiero poder ocultar las lineas de la cuadricula, para ver el patron con menos ruido visual.
+
+## Criterios de Aceptacion
+- [x] Existe un toggle o checkbox "Lineas de cuadricula" en la UI.
+- [x] Al desactivar, las lineas desaparecen sin afectar estados de celdas ni interaccion.
+- [x] Al activar, las lineas vuelven a mostrarse inmediatamente.
+- [x] El estado del toggle se mantiene durante la sesion y no cambia con Reset.
+
+## Fuera de Alcance
+- Persistencia entre sesiones.
+- Cambios de estilo avanzados.
+- Temas o skins.

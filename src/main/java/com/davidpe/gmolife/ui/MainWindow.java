@@ -96,6 +96,8 @@ public final class MainWindow {
   private Label zoomValue;
   private CheckBox toroidalToggle;
   private boolean toroidalEnabled;
+  private CheckBox gridLinesToggle;
+  private boolean gridLinesVisible = true;
   private Button aiRunButton;
   private Button aiCancelButton;
   private Button aiApplyButton;
@@ -134,6 +136,7 @@ public final class MainWindow {
   private StackPane buildGrid() {
     gridView = new EditableGridView(gridState, DEFAULT_CELL_SIZE);
     gridView.setPadding(new Insets(24));
+    gridView.setGridLinesVisible(gridLinesVisible);
 
     gridContainer = new StackPane(gridView);
     gridContainer.setPadding(new Insets(16));
@@ -232,6 +235,16 @@ public final class MainWindow {
           gridState.setToroidal(toroidalEnabled);
         });
 
+    gridLinesToggle = new CheckBox("Lineas de cuadricula");
+    gridLinesToggle.setSelected(true);
+    gridLinesToggle.setOnAction(
+        event -> {
+          gridLinesVisible = gridLinesToggle.isSelected();
+          if (gridView != null) {
+            gridView.setGridLinesVisible(gridLinesVisible);
+          }
+        });
+
     playButton.setOnAction(
         event -> {
           startPlay();
@@ -304,6 +317,7 @@ public final class MainWindow {
             gridSizeLabel,
             gridSizePicker,
             toroidalToggle,
+            gridLinesToggle,
             generationLabel,
             generationValue,
             populationLabel,
@@ -845,6 +859,7 @@ public final class MainWindow {
     gridState.setToroidal(toroidalEnabled);
     gridView = new EditableGridView(gridState, desiredCellSize);
     gridView.setPadding(new Insets(24));
+    gridView.setGridLinesVisible(gridLinesVisible);
     if (gridContainer != null) {
       gridContainer.getChildren().setAll(gridView);
     }

@@ -5,13 +5,14 @@ import javafx.scene.layout.Region;
 
 public final class EditableGridView extends GridPane {
 
-  private static final String DEAD_STYLE =
-      "-fx-background-color: #f5f6f7; -fx-border-color: #c7cdd1; -fx-border-width: 0.5;";
-  private static final String ALIVE_STYLE =
-      "-fx-background-color: #2ecc71; -fx-border-color: #1f2d3a; -fx-border-width: 0.5;";
+  private static final String DEAD_FILL = "#f5f6f7";
+  private static final String ALIVE_FILL = "#2ecc71";
+  private static final String DEAD_BORDER = "#c7cdd1";
+  private static final String ALIVE_BORDER = "#1f2d3a";
 
   private final GridState gridState;
   private double cellSize;
+  private boolean gridLinesVisible = true;
   private Region[][] cellViews;
 
   public EditableGridView(GridState gridState, double cellSize) {
@@ -61,7 +62,25 @@ public final class EditableGridView extends GridPane {
   }
 
   private void updateCellStyle(Region cell, boolean alive) {
-    cell.setStyle(alive ? ALIVE_STYLE : DEAD_STYLE);
+    cell.setStyle(styleFor(alive));
+  }
+
+  public void setGridLinesVisible(boolean visible) {
+    gridLinesVisible = visible;
+    refresh();
+  }
+
+  private String styleFor(boolean alive) {
+    String fill = alive ? ALIVE_FILL : DEAD_FILL;
+    if (!gridLinesVisible) {
+      return "-fx-background-color: " + fill + "; -fx-border-color: transparent; -fx-border-width: 0;";
+    }
+    String border = alive ? ALIVE_BORDER : DEAD_BORDER;
+    return "-fx-background-color: "
+        + fill
+        + "; -fx-border-color: "
+        + border
+        + "; -fx-border-width: 0.5;";
   }
 
   public void refresh() {
