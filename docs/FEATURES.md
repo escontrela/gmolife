@@ -934,3 +934,23 @@ Como usuario, quiero centrar el patron con un clic, para mantenerlo visible y or
 - Cambiar tamano de la cuadricula.
 - Rotar o espejar el patron.
 - Centrado automatico continuo.
+
+## TASK-044 — Dialogo de ayuda con atajos
+Estado: done
+
+## Objetivo
+Mostrar una ayuda rapida con los atajos de teclado disponibles.
+
+## Historia de Usuario
+Como usuario, quiero ver una lista de atajos en pantalla, para aprender a usar la app mas rapido.
+
+## Criterios de Aceptacion
+- [x] Existe un boton o menu "Ayuda" visible en la UI.
+- [x] Al abrirlo, se muestra un dialogo con los atajos actuales (Play/Pause, Step, Reset, Save, Load).
+- [x] El dialogo puede cerrarse sin afectar la simulacion.
+- [x] La informacion coincide con los atajos implementados.
+
+## Fuera de Alcance
+- Buscador de atajos.
+- Atajos configurables desde la UI.
+- Tutorial interactivo.

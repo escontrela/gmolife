@@ -210,6 +210,7 @@ public final class MainWindow {
     Button centerButton = new Button("Centrar");
     Button saveButton = new Button("Save");
     Button loadButton = new Button("Load");
+    Button helpButton = new Button("Ayuda");
     Button exportPngButton = new Button("Exportar PNG");
     Button copyPatternButton = new Button("Copiar patron");
     Button pastePatternButton = new Button("Pegar patron");
@@ -333,6 +334,11 @@ public final class MainWindow {
           loadPattern();
         });
 
+    helpButton.setOnAction(
+        event -> {
+          showShortcutsHelp();
+        });
+
     exportPngButton.setOnAction(
         event -> {
           exportGridPng();
@@ -385,6 +391,7 @@ public final class MainWindow {
             playStateRow,
             saveButton,
             loadButton,
+            helpButton,
             exportPngButton,
             copyPatternButton,
             pastePatternButton,
@@ -679,6 +686,19 @@ public final class MainWindow {
             event.consume();
           }
         });
+  }
+
+  private void showShortcutsHelp() {
+    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    alert.setTitle("Game of Life");
+    alert.setHeaderText("Atajos de teclado");
+    alert.setContentText(
+        "Play/Pause: Barra espaciadora\n"
+            + "Step: N\n"
+            + "Reset: R\n"
+            + "Save: Ctrl/Cmd+S\n"
+            + "Load: Ctrl/Cmd+O");
+    alert.showAndWait();
   }
 
   private void togglePlayPause() {
