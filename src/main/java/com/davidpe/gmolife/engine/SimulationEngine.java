@@ -47,10 +47,11 @@ public final class SimulationEngine {
 
   private GeneticSearchResult runGeneticSearch(
       GeneticSearchConfig config, CancellationToken token, GeneticSearchProgressListener listener) {
+    Random runRandom = config.seed() != null ? new Random(config.seed()) : random;
     List<boolean[][]> population = new ArrayList<>(config.populationSize());
     for (int i = 0; i < config.populationSize(); i++) {
       checkCancelled(token);
-      population.add(randomPattern(config.rows(), config.columns()));
+      population.add(randomPattern(config.rows(), config.columns(), runRandom));
     }
 
     boolean[][] bestPattern = null;
@@ -73,17 +74,17 @@ public final class SimulationEngine {
       next.add(copyPattern(scored.get(0).pattern));
       while (next.size() < config.populationSize()) {
         checkCancelled(token);
-        boolean[][] parentA = select(scored);
-        boolean[][] parentB = select(scored);
-        boolean[][] child = crossover(parentA, parentB, config.crossoverRate());
-        mutate(child, config.mutationRate());
+        boolean[][] parentA = select(scored, runRandom);
+        boolean[][] parentB = select(scored, runRandom);
+        boolean[][] child = crossover(parentA, parentB, config.crossoverRate(), runRandom);
+        mutate(child, config.mutationRate(), runRandom);
         next.add(child);
       }
       population = next;
     }
 
     if (bestPattern == null) {
-      bestPattern = randomPattern(config.rows(), config.columns());
+      bestPattern = randomPattern(config.rows(), config.columns(), runRandom);
       bestFitness = scorePattern(bestPattern, config.evaluationSteps(), config.objective(), token);
     }
     return new GeneticSearchResult(bestPattern, bestFitness);
@@ -168,11 +169,11 @@ public final class SimulationEngine {
     return gliderScore + average;
   }
 
-  private boolean[][] select(List<ScoredPattern> scored) {
+  private boolean[][] select(List<ScoredPattern> scored, Random runRandom) {
     int tournamentSize = Math.min(3, scored.size());
-    ScoredPattern best = scored.get(random.nextInt(scored.size()));
+    ScoredPattern best = scored.get(runRandom.nextInt(scored.size()));
     for (int i = 1; i < tournamentSize; i++) {
-      ScoredPattern candidate = scored.get(random.nextInt(scored.size()));
+      ScoredPattern candidate = scored.get(runRandom.nextInt(scored.size()));
       if (candidate.fitness > best.fitness) {
         best = candidate;
       }
@@ -180,13 +181,14 @@ public final class SimulationEngine {
     return best.pattern;
   }
 
-  private boolean[][] crossover(boolean[][] parentA, boolean[][] parentB, double rate) {
-    if (random.nextDouble() >= rate) {
+  private boolean[][] crossover(
+      boolean[][] parentA, boolean[][] parentB, double rate, Random runRandom) {
+    if (runRandom.nextDouble() >= rate) {
       return copyPattern(parentA);
     }
     int rows = parentA.length;
     int columns = parentA[0].length;
-    int splitRow = random.nextInt(rows);
+    int splitRow = runRandom.nextInt(rows);
     boolean[][] child = new boolean[rows][columns];
     for (int row = 0; row < rows; row++) {
       boolean[][] source = row <= splitRow ? parentA : parentB;
@@ -195,22 +197,22 @@ public final class SimulationEngine {
     return child;
   }
 
-  private void mutate(boolean[][] pattern, double mutationRate) {
+  private void mutate(boolean[][] pattern, double mutationRate, Random runRandom) {
     for (int row = 0; row < pattern.length; row++) {
       for (int column = 0; column < pattern[row].length; column++) {
-        if (random.nextDouble() < mutationRate) {
+        if (runRandom.nextDouble() < mutationRate) {
           pattern[row][column] = !pattern[row][column];
         }
       }
     }
   }
 
-  private boolean[][] randomPattern(int rows, int columns) {
+  private boolean[][] randomPattern(int rows, int columns, Random runRandom) {
     boolean[][] pattern = new boolean[rows][columns];
-    double probability = 0.25 + random.nextDouble() * 0.25;
+    double probability = 0.25 + runRandom.nextDouble() * 0.25;
     for (int row = 0; row < rows; row++) {
       for (int column = 0; column < columns; column++) {
-        pattern[row][column] = random.nextDouble() < probability;
+        pattern[row][column] = runRandom.nextDouble() < probability;
       }
     }
     return pattern;
@@ -371,7 +373,8 @@ public final class SimulationEngine {
       int evaluationSteps,
       double mutationRate,
       double crossoverRate,
-      GeneticObjective objective) {
+      GeneticObjective objective,
+      Long seed) {
 
     public GeneticSearchConfig {
       if (rows < 1 || columns < 1) {

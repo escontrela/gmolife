@@ -1014,3 +1014,23 @@ Como usuario, quiero seleccionar que tipo de resultado quiero de la IA, para ori
 - Editor avanzado de funciones de fitness.
 - Objetivos personalizados por el usuario.
 - Entrenamiento multiobjetivo.
+
+## TASK-048 — Semilla reproducible para ejecuciones IA
+Estado: done
+
+## Objetivo
+Hacer reproducibles las ejecuciones de IA permitiendo definir una semilla numerica.
+
+## Historia de Usuario
+Como usuario, quiero ejecutar la IA con una semilla fija, para repetir resultados y comparar configuraciones.
+
+## Criterios de Aceptacion
+- [x] La UI de IA incluye un campo opcional de semilla numerica.
+- [x] Si se informa una semilla, dos ejecuciones con mismos parametros producen el mismo mejor patron y fitness.
+- [x] Si el campo queda vacio, la app usa un valor aleatorio como hoy.
+- [x] Se muestra en la UI la semilla usada en la ultima ejecucion.
+
+## Fuera de Alcance
+- Persistencia de historial largo de semillas.
+- Multiples semillas en lote.
+- Generador criptografico.

@@ -132,6 +132,7 @@ public final class MainWindow {
   private Label aiIterationValue;
   private Label aiStatusValue;
   private Label aiObjectiveValue;
+  private Label aiSeedValue;
   private Label statusMessage;
   private Label cursorPositionValue;
   private EditableGridView aiPreviewView;
@@ -139,6 +140,7 @@ public final class MainWindow {
   private TextField aiPopulationField;
   private TextField aiGenerationsField;
   private TextField aiMutationField;
+  private TextField aiSeedField;
   private ComboBox<SimulationEngine.GeneticObjective> aiObjectivePicker;
   private CompletableFuture<SimulationEngine.GeneticSearchResult> aiSearch;
   private boolean[][] aiResultPattern;
@@ -519,6 +521,12 @@ public final class MainWindow {
     HBox mutationRow = new HBox(mutationLabel, aiMutationField);
     mutationRow.setSpacing(6);
 
+    Label seedLabel = new Label("Semilla (opcional):");
+    aiSeedField = new TextField();
+    aiSeedField.setPrefColumnCount(10);
+    HBox seedRow = new HBox(seedLabel, aiSeedField);
+    seedRow.setSpacing(6);
+
     Label objectiveLabel = new Label("Objetivo:");
     aiObjectivePicker = new ComboBox<>();
     aiObjectivePicker.getItems().addAll(SimulationEngine.GeneticObjective.values());
@@ -547,6 +555,11 @@ public final class MainWindow {
     HBox objectiveValueRow = new HBox(objectiveValueLabel, aiObjectiveValue);
     objectiveValueRow.setSpacing(6);
 
+    Label seedValueLabel = new Label("Semilla usada:");
+    aiSeedValue = new Label("-");
+    HBox seedValueRow = new HBox(seedValueLabel, aiSeedValue);
+    seedValueRow.setSpacing(6);
+
     Label previewLabel = new Label("Vista previa:");
     aiPreviewView = new EditableGridView(aiPreviewState, AI_PREVIEW_CELL_SIZE);
     aiPreviewView.setMouseTransparent(true);
@@ -564,11 +577,13 @@ public final class MainWindow {
             populationRow,
             generationsRow,
             mutationRow,
+            seedRow,
             objectiveRow,
             iterationRow,
             statusRow,
             fitnessRow,
             objectiveValueRow,
+            seedValueRow,
             previewLabel,
             aiPreviewContainer);
     panel.setSpacing(8);
@@ -944,6 +959,10 @@ public final class MainWindow {
     if (aiObjectiveValue != null) {
       aiObjectiveValue.setText(formatObjective(objective));
     }
+    Long seed = resolveAiSeed();
+    if (aiSeedValue != null) {
+      aiSeedValue.setText(Long.toString(seed));
+    }
     aiCancellationToken = new SimulationEngine.CancellationToken();
     int populationSize = resolveAiPopulationSize();
     int generations = resolveAiGenerations();
@@ -957,7 +976,8 @@ public final class MainWindow {
             AI_EVALUATION_STEPS,
             mutationRate,
             AI_CROSSOVER_RATE,
-            objective);
+            objective,
+            seed);
     SimulationEngine.GeneticSearchProgressListener progressListener =
         (iteration, bestFitness) -> {
           Platform.runLater(() -> updateAiProgress(iteration, bestFitness));
@@ -1050,6 +1070,22 @@ public final class MainWindow {
     }
     SimulationEngine.GeneticObjective selected = aiObjectivePicker.getValue();
     return selected != null ? selected : AI_DEFAULT_OBJECTIVE;
+  }
+
+  private Long resolveAiSeed() {
+    if (aiSeedField == null) {
+      return random.nextLong();
+    }
+    String raw = aiSeedField.getText();
+    if (raw == null || raw.isBlank()) {
+      return random.nextLong();
+    }
+    try {
+      return Long.parseLong(raw.trim());
+    } catch (NumberFormatException ex) {
+      showError("La semilla debe ser un numero entero. Se usara una semilla aleatoria.");
+      return random.nextLong();
+    }
   }
 
   private String formatObjective(SimulationEngine.GeneticObjective objective) {
