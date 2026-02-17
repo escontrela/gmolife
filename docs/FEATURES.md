@@ -524,3 +524,23 @@ Como usuario, quiero ver el progreso actual de la IA mientras corre, para decidi
 - Grafica detallada del progreso.
 - Exportar historico de fitness.
 - Notificaciones del sistema.
+
+## TASK-022 — Grafica de nacimientos y muertes
+Estado: backlog
+
+## Objetivo
+Agregar series de nacimientos y muertes por generacion en la grafica de evolucion.
+
+## Historia de Usuario
+Como usuario, quiero ver nacimientos y muertes por generacion, para entender mejor la dinamica del patron.
+
+## Criterios de Aceptacion
+- [ ] La grafica incluye dos series adicionales: nacimientos y muertes por generacion.
+- [ ] Las series se actualizan al usar Step y durante Play.
+- [ ] Al pulsar Reset, las series se reinician.
+- [ ] Se mantienen como minimo los ultimos 100 puntos por serie.
+
+## Fuera de Alcance
+- Estadisticas acumuladas o promedios.
+- Exportar datos a CSV.
+- Anotaciones en la grafica.
