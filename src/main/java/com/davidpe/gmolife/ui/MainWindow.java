@@ -83,6 +83,7 @@ public final class MainWindow {
   private static final double AI_MUTATION_RATE = 0.05;
   private static final double AI_CROSSOVER_RATE = 0.6;
   private static final double AI_PREVIEW_CELL_SIZE = 6;
+  private static final double AI_AUTO_APPLY_THRESHOLD = 25.0;
   private static final SimulationEngine.GeneticObjective AI_DEFAULT_OBJECTIVE =
       SimulationEngine.GeneticObjective.HIGH_POPULATION;
   private static final List<GridSize> GRID_SIZES =
@@ -146,9 +147,13 @@ public final class MainWindow {
   private TextField aiGenerationsField;
   private TextField aiMutationField;
   private TextField aiSeedField;
+  private TextField aiAutoApplyThresholdField;
   private ComboBox<SimulationEngine.GeneticObjective> aiObjectivePicker;
   private final List<String> aiHistoryEntries = new ArrayList<>(5);
   private SimulationEngine.GeneticObjective lastAiObjectiveUsed = AI_DEFAULT_OBJECTIVE;
+  private boolean lastAiAutoApplyEnabled;
+  private double lastAiAutoApplyThreshold = AI_AUTO_APPLY_THRESHOLD;
+  private CheckBox aiAutoApplyToggle;
   private CompletableFuture<SimulationEngine.GeneticSearchResult> aiSearch;
   private boolean[][] aiResultPattern;
   private SimulationEngine.CancellationToken aiCancellationToken;
@@ -542,6 +547,14 @@ public final class MainWindow {
     HBox objectiveRow = new HBox(objectiveLabel, aiObjectivePicker);
     objectiveRow.setSpacing(6);
 
+    aiAutoApplyToggle = new CheckBox("Auto-aplicar");
+    aiAutoApplyToggle.setSelected(false);
+    Label thresholdLabel = new Label("Umbral fitness:");
+    aiAutoApplyThresholdField = new TextField(String.format("%.2f", AI_AUTO_APPLY_THRESHOLD));
+    aiAutoApplyThresholdField.setPrefColumnCount(6);
+    HBox autoApplyRow = new HBox(aiAutoApplyToggle, thresholdLabel, aiAutoApplyThresholdField);
+    autoApplyRow.setSpacing(6);
+
     Label iterationLabel = new Label("Iteracion:");
     aiIterationValue = new Label("0");
     HBox iterationRow = new HBox(iterationLabel, aiIterationValue);
@@ -590,6 +603,7 @@ public final class MainWindow {
             mutationRow,
             seedRow,
             objectiveRow,
+            autoApplyRow,
             iterationRow,
             statusRow,
             fitnessRow,
@@ -973,6 +987,8 @@ public final class MainWindow {
       aiObjectiveValue.setText(formatObjective(objective));
     }
     lastAiObjectiveUsed = objective;
+    lastAiAutoApplyEnabled = aiAutoApplyToggle != null && aiAutoApplyToggle.isSelected();
+    lastAiAutoApplyThreshold = resolveAiAutoApplyThreshold();
     Long seed = resolveAiSeed();
     if (aiSeedValue != null) {
       aiSeedValue.setText(Long.toString(seed));
@@ -1048,9 +1064,6 @@ public final class MainWindow {
       showError("No se pudo completar la busqueda IA: " + cause.getMessage());
       return;
     }
-    if (aiStatusValue != null) {
-      aiStatusValue.setText("Listo");
-    }
     aiResultPattern = result.pattern();
     if (aiFitnessValue != null) {
       aiFitnessValue.setText(String.format("%.2f", result.fitness()));
@@ -1060,6 +1073,23 @@ public final class MainWindow {
     }
     updateAiPreview(aiResultPattern);
     addAiHistoryEntry(result.fitness(), lastAiObjectiveUsed);
+    if (lastAiAutoApplyEnabled) {
+      if (result.fitness() >= lastAiAutoApplyThreshold) {
+        if (aiStatusValue != null) {
+          aiStatusValue.setText("Auto-aplicado");
+        }
+        applyAiPattern();
+      } else {
+        if (aiStatusValue != null) {
+          aiStatusValue.setText(
+              String.format(
+                  "No aplicado: fitness %.2f < umbral %.2f",
+                  result.fitness(), lastAiAutoApplyThreshold));
+        }
+      }
+    } else if (aiStatusValue != null) {
+      aiStatusValue.setText("Listo");
+    }
   }
 
   private void applyAiPattern() {
@@ -1115,6 +1145,30 @@ public final class MainWindow {
     } catch (NumberFormatException ex) {
       showError("La semilla debe ser un numero entero. Se usara una semilla aleatoria.");
       return random.nextLong();
+    }
+  }
+
+  private double resolveAiAutoApplyThreshold() {
+    if (aiAutoApplyThresholdField == null) {
+      return AI_AUTO_APPLY_THRESHOLD;
+    }
+    String raw = aiAutoApplyThresholdField.getText();
+    if (raw == null || raw.isBlank()) {
+      aiAutoApplyThresholdField.setText(String.format("%.2f", AI_AUTO_APPLY_THRESHOLD));
+      return AI_AUTO_APPLY_THRESHOLD;
+    }
+    try {
+      double value = Double.parseDouble(raw.trim());
+      if (value < 0) {
+        showError("El umbral de fitness no puede ser negativo. Se usara el valor por defecto.");
+        aiAutoApplyThresholdField.setText(String.format("%.2f", AI_AUTO_APPLY_THRESHOLD));
+        return AI_AUTO_APPLY_THRESHOLD;
+      }
+      return value;
+    } catch (NumberFormatException ex) {
+      showError("El umbral de fitness no es valido. Se usara el valor por defecto.");
+      aiAutoApplyThresholdField.setText(String.format("%.2f", AI_AUTO_APPLY_THRESHOLD));
+      return AI_AUTO_APPLY_THRESHOLD;
     }
   }
 

@@ -1054,3 +1054,23 @@ Como usuario, quiero ver los ultimos resultados de IA, para decidir cual patron 
 - Persistencia entre sesiones.
 - Exportacion del historial.
 - Comparador visual avanzado entre patrones.
+
+## TASK-050 — Aplicacion automatica por umbral de fitness
+Estado: done
+
+## Objetivo
+Permitir aplicar automaticamente el mejor patron de IA cuando supere un umbral de fitness configurable.
+
+## Historia de Usuario
+Como usuario, quiero que la app aplique automaticamente resultados suficientemente buenos, para acelerar la exploracion sin pasos manuales.
+
+## Criterios de Aceptacion
+- [x] Existe un toggle "Auto-aplicar" y un campo de umbral de fitness en la seccion IA.
+- [x] Al terminar la IA, si el fitness final es mayor o igual al umbral y el toggle esta activo, el patron se aplica automaticamente.
+- [x] Si no cumple el umbral, no se aplica y la UI muestra el motivo.
+- [x] El comportamiento no rompe la opcion manual de "Aplicar IA" existente.
+
+## Fuera de Alcance
+- Reglas complejas de auto-aplicacion por objetivo.
+- Aplicaciones encadenadas de multiples resultados.
+- Persistencia de configuracion entre sesiones.
