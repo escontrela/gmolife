@@ -5,6 +5,8 @@ import com.davidpe.gmolife.pattern.PatternData;
 import com.davidpe.gmolife.pattern.PatternIO;
 import com.davidpe.gmolife.ui.grid.EditableGridView;
 import com.davidpe.gmolife.ui.grid.GridState;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -15,13 +17,16 @@ import java.util.Random;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import javax.imageio.ImageIO;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
@@ -35,6 +40,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
@@ -183,6 +189,7 @@ public final class MainWindow {
     Button randomizeButton = new Button("Randomize");
     Button saveButton = new Button("Save");
     Button loadButton = new Button("Load");
+    Button exportPngButton = new Button("Exportar PNG");
     pauseButton.setDisable(true);
 
     timeline =
@@ -294,6 +301,11 @@ public final class MainWindow {
           loadPattern();
         });
 
+    exportPngButton.setOnAction(
+        event -> {
+          exportGridPng();
+        });
+
     Label patternLabel = new Label("Patrones:");
     ComboBox<String> patternPicker = new ComboBox<>();
     patternPicker.getItems().addAll(BASIC_PATTERNS);
@@ -329,6 +341,7 @@ public final class MainWindow {
             randomizeButton,
             saveButton,
             loadButton,
+            exportPngButton,
             patternLabel,
             patternPicker,
             speedLabel,
@@ -1266,6 +1279,30 @@ public final class MainWindow {
     alert.setHeaderText("Operacion fallida");
     alert.setContentText(message);
     alert.showAndWait();
+  }
+
+  private void exportGridPng() {
+    if (gridView == null) {
+      showError("No hay una cuadricula disponible para exportar.");
+      return;
+    }
+    FileChooser chooser = new FileChooser();
+    chooser.setTitle("Exportar PNG");
+    chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG", "*.png"));
+    chooser.setInitialFileName("tablero.png");
+    File file = chooser.showSaveDialog(stage);
+    if (file == null) {
+      return;
+    }
+    SnapshotParameters parameters = new SnapshotParameters();
+    WritableImage image = gridView.snapshot(parameters, null);
+    BufferedImage buffered = SwingFXUtils.fromFXImage(image, null);
+    try {
+      ImageIO.write(buffered, "png", file);
+      showInfo("PNG guardado en " + file.getName() + ".");
+    } catch (IOException ex) {
+      showError("No se pudo exportar el PNG: " + ex.getMessage());
+    }
   }
 
   private boolean[][] buildRandomPattern(double probability) {

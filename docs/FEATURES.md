@@ -702,3 +702,23 @@ Como usuario, quiero confirmar el reset si tengo un patron en pantalla, para no 
 ## Fuera de Alcance
 - Preferencias persistentes de confirmacion.
 - Confirmaciones para otras acciones (Load, Randomize).
+
+## TASK-032 — Exportar imagen PNG del tablero
+Estado: done
+
+## Objetivo
+Permitir guardar una imagen PNG del estado actual de la cuadricula.
+
+## Historia de Usuario
+Como usuario, quiero exportar una imagen del patron actual, para compartirlo o documentarlo.
+
+## Criterios de Aceptacion
+- [x] Existe un boton "Exportar PNG" visible en la UI.
+- [x] Al presionarlo, se abre un selector para guardar el archivo.
+- [x] El PNG contiene solo la cuadricula (sin controles) con los colores actuales.
+- [x] Se muestra confirmacion de guardado exitoso o mensaje de error.
+
+## Fuera de Alcance
+- Exportar animaciones o multiples frames.
+- Formatos alternativos (SVG, JPG).
+- Exportacion automatica.
