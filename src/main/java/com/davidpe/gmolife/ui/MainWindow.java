@@ -159,6 +159,7 @@ public final class MainWindow {
 
   private StackPane buildGrid() {
     gridView = new EditableGridView(gridState, DEFAULT_CELL_SIZE);
+    gridView.setOnEdit(this::pauseIfEditingDuringPlay);
     gridView.setPadding(new Insets(24));
     gridView.setGridLinesVisible(gridLinesVisible);
 
@@ -562,6 +563,15 @@ public final class MainWindow {
     }
     resetTps();
     updatePlayState(false);
+  }
+
+  private void pauseIfEditingDuringPlay() {
+    if (timeline == null) {
+      return;
+    }
+    if (timeline.getStatus() == Animation.Status.RUNNING) {
+      pausePlay();
+    }
   }
 
   private void resetSimulation() {
@@ -1026,6 +1036,7 @@ public final class MainWindow {
     gridState = new GridState(size.rows, size.columns);
     gridState.setToroidal(toroidalEnabled);
     gridView = new EditableGridView(gridState, desiredCellSize);
+    gridView.setOnEdit(this::pauseIfEditingDuringPlay);
     gridView.setPadding(new Insets(24));
     gridView.setGridLinesVisible(gridLinesVisible);
     if (gridContainer != null) {

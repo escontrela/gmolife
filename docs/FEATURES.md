@@ -819,3 +819,21 @@ Como usuario, quiero confirmar la carga si tengo un patron en pantalla, para no 
 ## Fuera de Alcance
 - Confirmaciones para Save o Export.
 - Preferencias persistentes de confirmacion.
+
+## TASK-037 — Auto-pause al editar celdas
+Estado: done
+
+## Objetivo
+Pausar la simulacion cuando el usuario edita la cuadricula durante Play.
+
+## Historia de Usuario
+Como usuario, quiero que la simulacion se pause si edito celdas, para evitar resultados confusos mientras la ejecucion esta activa.
+
+## Criterios de Aceptacion
+- [x] Si la simulacion esta en Play y el usuario hace click o arrastra para editar, se detiene el temporizador.
+- [x] La UI refleja el cambio a estado Pause inmediatamente.
+- [x] Si ya estaba en Pause, editar no cambia el estado.
+
+## Fuera de Alcance
+- Opcion para desactivar este comportamiento.
+- Edicion durante Play sin pausa.

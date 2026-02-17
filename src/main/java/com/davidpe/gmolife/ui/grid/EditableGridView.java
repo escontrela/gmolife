@@ -14,6 +14,7 @@ public final class EditableGridView extends GridPane {
   private double cellSize;
   private boolean gridLinesVisible = true;
   private Region[][] cellViews;
+  private Runnable onEdit;
 
   public EditableGridView(GridState gridState, double cellSize) {
     this.gridState = gridState;
@@ -36,10 +37,18 @@ public final class EditableGridView extends GridPane {
     Region cell = new Region();
     applyCellSize(cell);
     updateCellStyle(cell, gridState.isAlive(row, column));
-    cell.setOnMouseClicked(
+    cell.setOnMousePressed(
         event -> {
           gridState.toggle(row, column);
           updateCellStyle(cell, gridState.isAlive(row, column));
+          notifyEdit();
+        });
+    cell.setOnDragDetected(event -> cell.startFullDrag());
+    cell.setOnMouseDragEntered(
+        event -> {
+          gridState.toggle(row, column);
+          updateCellStyle(cell, gridState.isAlive(row, column));
+          notifyEdit();
         });
     return cell;
   }
@@ -58,6 +67,16 @@ public final class EditableGridView extends GridPane {
       for (int column = 0; column < gridState.getColumns(); column++) {
         applyCellSize(cellViews[row][column]);
       }
+    }
+  }
+
+  public void setOnEdit(Runnable onEdit) {
+    this.onEdit = onEdit;
+  }
+
+  private void notifyEdit() {
+    if (onEdit != null) {
+      onEdit.run();
     }
   }
 
